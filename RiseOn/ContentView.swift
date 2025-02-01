@@ -8,69 +8,50 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var isToggled = false
+    @State private var isRadioSelected = false
+    @State private var isChecked = false
+    @State private var isTabSelected = false
+    @State private var isCardSelected = false
+    
     var body: some View {
-        ZStack {
-//            Color.black
-//                .ignoresSafeArea()
-            
-            VStack {
-                VStack {
-                    Image("logoRiseOn")
-                    
-                }
-                .frame(width: 200, height: 100)
+        ScrollView {
+            VStack(spacing: 20) {
+                Text("Custom Buttons").font(.title).foregroundColor(.white)
                 
+                CustomButton(title: "Start", state: .normal) { print("Start clicked") }
+                CustomButton(title: "Start (Hover)", state: .hover) { }
+                CustomButton(title: "Start (Focused)", state: .focused) { }
+                CustomButton(title: "Start (Disabled)", state: .disabled) { }
                 
-                VStack {
-                    Text("Sunset Gradient")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(LinearGradient.gradientDarkGreen)
-                        .cornerRadius(10)
-                    
-                    Text("Ocean Gradient")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(LinearGradient.gradientDarkGrey)
-                        .cornerRadius(10)
-                    
-                    Text("Neon Gradient")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(LinearGradient.gradientLightGreen)
-                        .cornerRadius(10)
-                    Text("Neon Gradient")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(LinearGradient.gradientLightGrey)
-                        .cornerRadius(10)
-                    
-                    VStack(spacing: 6) {
-                        Image("Logo")
-                            
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 40, height: 50)
-                        Text("RISEON")
-                            .font(.custom("Orbitron", size: 28))
-                            .kerning(3)
-                            .fontWeight(.medium)
-                            .foregroundColor(.white)
-                    }
-                    Text("RISEON")
-                        .font(.custom("Orbitron", size: 28))
-                        .kerning(2)
-                        .fontWeight(.medium)
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(LinearGradient.gradientCard)
-                        .cornerRadius(10)
-                    
-                    
-                    
-                }
+                Divider().background(Color.white)
+                
+                Text("Toggle Switch").font(.title2).foregroundColor(.white)
+                CustomToggle(isOn: $isToggled)
+                
+                Divider().background(Color.white)
+                
+                Text("Radio Button").font(.title2).foregroundColor(.white)
+                RadioButton(title: "Male", isSelected: $isRadioSelected)
+                
+                Divider().background(Color.white)
+                
+                Text("Checkbox").font(.title2).foregroundColor(.white)
+                Checkbox(isChecked: $isChecked)
+                
+                Divider().background(Color.white)
+                
+                Text("Tabs").font(.title2).foregroundColor(.white)
+                TabButton(title: "Balance", isSelected: $isTabSelected)
+                
+                Divider().background(Color.white)
+                
+                Text("Selection Card").font(.title2).foregroundColor(.white)
+                SelectionCard(title: "Lose weight", subtitle: "Reduce body fat", isSelected: $isCardSelected)
             }
+            .padding()
         }
+        .background(Color.black.edgesIgnoringSafeArea(.all))
     }
 }
 
