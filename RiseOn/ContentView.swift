@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var isChecked = false
     @State private var isTabSelected = false
     @State private var isCardSelected = false
+    @State private var selectedUnit: SegmentedControl.UnitType = .imperial
     
     var body: some View {
         ScrollView {
@@ -23,6 +24,8 @@ struct ContentView: View {
                 CustomButton(title: "Start (Hover)", state: .hover) { }
                 CustomButton(title: "Start (Focused)", state: .focused) { }
                 CustomButton(title: "Start (Disabled)", state: .disabled) { }
+                
+                SegmentedControl(selectedUnit: $selectedUnit)
                 
                 Divider().background(Color.white)
                 

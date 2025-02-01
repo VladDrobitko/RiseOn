@@ -18,7 +18,7 @@ struct Colors {
     static let error: Color = Color("error")
     static let focusedButton: Color = Color("focusedButton")
     static let hoverButton: Color = Color("hoverButton")
-    static let primary: Color = Color("primary")
+    static let primaryButton: Color = Color("primaryButton")
     static let typographyDisabled: Color = Color("typographyDisabled")
     static let typographyGrey: Color = Color("typographyGrey")
     static let typographyPrimary: Color = Color("typographyPrimary")

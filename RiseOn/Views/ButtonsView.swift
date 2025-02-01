@@ -13,10 +13,10 @@ enum ButtonState {
     
     var backgroundColor: Color {
         switch self {
-        case .normal: return Color.gray.opacity(0.2)
-        case .hover: return Color.blue.opacity(0.4)
-        case .focused: return Color.blue.opacity(0.6)
-        case .disabled: return Color.gray.opacity(0.3)
+        case .normal: return Color.primaryButton
+        case .hover: return Color.hoverButton
+        case .focused: return Color.focusedButton
+        case .disabled: return Color.disabledButton
         }
     }
 }
@@ -35,11 +35,11 @@ struct CustomButton: View {
             }
         }) {
             Text(title)
-                .font(.headline)
+                .font(.subheadline)
                 .padding()
                 .frame(maxWidth: .infinity)
                 .background(state.backgroundColor)
-                .foregroundColor(state == .disabled ? Color.gray : Color.white)
+                .foregroundColor(state == .disabled ? Color.disabled : Color.black)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .contentShape(Rectangle()) // Делаем всю кнопку кликабельной
                 .scaleEffect(isHovered ? 1.05 : 1.0) // Легкое увеличение при наведении
@@ -60,7 +60,7 @@ struct CustomToggle: View {
         ZStack {
             RoundedRectangle(cornerRadius: 15)
                 .frame(width: 50, height: 30)
-                .foregroundColor(isOn ? Color.green : Color.gray)
+                .foregroundColor(isOn ? Color.primaryButton : Color.gray)
                 .animation(.easeInOut(duration: 0.2), value: isOn)
             
             Circle()
@@ -83,11 +83,11 @@ struct RadioButton: View {
     var body: some View {
         HStack {
             Circle()
-                .stroke(isSelected ? Color.yellow : Color.gray, lineWidth: 2)
+                .stroke(isSelected ? Color.primaryButton : Color.gray, lineWidth: 2)
                 .frame(width: 20, height: 20)
                 .overlay(
                     Circle()
-                        .fill(isSelected ? Color.yellow : Color.clear)
+                        .fill(isSelected ? Color.primaryButton : Color.clear)
                         .frame(width: 12, height: 12)
                 )
                 .animation(.easeInOut(duration: 0.2), value: isSelected)
@@ -104,19 +104,26 @@ struct RadioButton: View {
 // MARK: - Animated Checkbox
 struct Checkbox: View {
     @Binding var isChecked: Bool
-    
+
     var body: some View {
         HStack {
-            RoundedRectangle(cornerRadius: 5)
-                .stroke(isChecked ? Color.green : Color.gray, lineWidth: 2)
-                .frame(width: 20, height: 20)
+            RoundedRectangle(cornerRadius: 15)
+                .fill(isChecked ? Color.primaryButton : Color.clear) // Заливка при активации
+                .frame(width: 24, height: 24) // Увеличил размер для удобства нажатия
                 .overlay(
-                    Image(systemName: isChecked ? "checkmark" : "")
-                        .foregroundColor(Color.green)
-                        .opacity(isChecked ? 1 : 0)
+                    RoundedRectangle(cornerRadius: 15)
+                        .stroke(isChecked ? Color.primaryButton : Color.typographyDisabled, lineWidth: 2) // Граница чекбокса
+                )
+                .overlay(
+                    Image(systemName: "checkmark")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 12, height: 12) // Иконка меньше чекбокса
+                        .foregroundColor(Color.typographyDisabled) // Оставляем цвет неизменным
+                        .opacity(isChecked ? 1 : 0) // Плавное появление
                         .animation(.easeInOut(duration: 0.2), value: isChecked)
                 )
-            
+
             Text("Check me")
                 .foregroundColor(.white)
         }
@@ -125,6 +132,7 @@ struct Checkbox: View {
         }
     }
 }
+
 
 // MARK: - Animated Tab Button
 struct TabButton: View {
@@ -135,9 +143,9 @@ struct TabButton: View {
         Text(title)
             .padding()
             .frame(width: 100)
-            .background(isSelected ? Color.yellow : Color.gray.opacity(0.3))
+            .background(isSelected ? LinearGradient.gradientDarkGreen : LinearGradient.gradientDarkGrey)
             .foregroundColor(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .clipShape(RoundedRectangle(cornerRadius: 25))
             .scaleEffect(isSelected ? 1.05 : 1.0) // Увеличение при выборе
             .animation(.spring(), value: isSelected)
             .onTapGesture {
@@ -153,18 +161,21 @@ struct SelectionCard: View {
     @Binding var isSelected: Bool
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.white)
-            
-            Text(subtitle)
-                .font(.subheadline)
-                .foregroundColor(.gray)
+        HStack { // Добавляем HStack, чтобы выровнять текст влево
+            VStack(alignment: .leading) { // Меняем alignment на .leading
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.white)
+
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundColor(.typographyGrey)
+            }
+            Spacer() // Раздвигает элементы, текст уходит влево
         }
         .padding()
-        .frame(width: 200)
-        .background(isSelected ? Color.yellow.opacity(0.5) : Color.gray.opacity(0.3))
+        .frame(maxWidth: .infinity)
+        .background(isSelected ? LinearGradient.gradientDarkGreen : LinearGradient.gradientDarkGrey)
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .scaleEffect(isSelected ? 1.05 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: isSelected)
@@ -173,6 +184,41 @@ struct SelectionCard: View {
         }
     }
 }
+
+struct SegmentedControl: View {
+    enum UnitType: String {
+        case imperial = "lbs/ft"
+        case metric = "kg/cm"
+    }
+    
+    @Binding var selectedUnit: UnitType
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach([UnitType.imperial, UnitType.metric], id: \.self) { unit in
+                Text(unit.rawValue)
+                    .font(.subheadline)
+                    .foregroundColor(selectedUnit == unit ? .white : .typographyGrey)
+                    .frame(maxWidth: .infinity, minHeight: 32) // Гибкая ширина
+                    .background(selectedUnit == unit ? LinearGradient.gradientDarkGreen : LinearGradient.gradientDarkGrey)
+                    .clipShape(Capsule()) // Скругление
+                    .onTapGesture {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            selectedUnit = unit
+                        }
+                    }
+            }
+        }
+        .clipShape(Capsule()) // Общая форма
+        .overlay(
+            Capsule()
+                .stroke(Color.typographyGrey, lineWidth: 0.3) // Граница
+        )
+        .frame(width: 120, height: 32) // Фиксированный размер, можно убрать для гибкости
+    }
+}
+
+
 
 
 // MARK: - Preview
