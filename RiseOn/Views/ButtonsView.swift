@@ -144,9 +144,12 @@ struct TabButton: View {
             .padding()
             .frame(width: 100)
             .background(isSelected ? LinearGradient.gradientDarkGreen : LinearGradient.gradientDarkGrey)
+            .overlay(
+                RoundedRectangle(cornerRadius: 25)
+                    .stroke(isSelected ? Color.primaryButton : Color.typographyDisabled, lineWidth: 1) // Граница чекбокса
+            )
             .foregroundColor(.white)
             .clipShape(RoundedRectangle(cornerRadius: 25))
-            .scaleEffect(isSelected ? 1.05 : 1.0) // Увеличение при выборе
             .animation(.spring(), value: isSelected)
             .onTapGesture {
                 isSelected.toggle()
@@ -176,8 +179,11 @@ struct SelectionCard: View {
         .padding()
         .frame(maxWidth: .infinity)
         .background(isSelected ? LinearGradient.gradientDarkGreen : LinearGradient.gradientDarkGrey)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(isSelected ? Color.primaryButton : Color.typographyDisabled, lineWidth: 1) // Граница чекбокса
+        )
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .scaleEffect(isSelected ? 1.05 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: isSelected)
         .onTapGesture {
             isSelected.toggle()

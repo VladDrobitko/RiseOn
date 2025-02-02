@@ -14,6 +14,8 @@ struct ContentView: View {
     @State private var isTabSelected = false
     @State private var isCardSelected = false
     @State private var selectedUnit: SegmentedControl.UnitType = .imperial
+    @State private var name: String = ""
+    @State private var height: String = ""
     
     var body: some View {
         ScrollView {
@@ -26,6 +28,13 @@ struct ContentView: View {
                 CustomButton(title: "Start (Disabled)", state: .disabled) { }
                 
                 SegmentedControl(selectedUnit: $selectedUnit)
+                
+                VStack(spacing: 16) {
+                    CustomTextField(title: "Name", text: $name, placeholder: "Enter your name", state: .default)
+                    
+                    CustomTextField(title: "Height", text: $height, placeholder: "cm", errorMessage: "Cannot be less than 122 cm", state: .error, keyboardType: .numberPad)
+                }
+                .padding()
                 
                 Divider().background(Color.white)
                 
