@@ -16,8 +16,9 @@ struct SurveyResult: View {
         NavigationStack {
             VStack {
                 Text("Ваши ответы").font(.title)
-                
-                Text("Пол: \(viewModel.gender ?? "—")")
+                Text("Имя: \(viewModel.name)")
+                Text("Возраст: \(viewModel.age ?? 0)")
+                Text("Пол: \(viewModel.gender ?? .male)")
                 Text("Рост: \(viewModel.height ?? 0) см")
                 Text("Вес: \(viewModel.weight ?? 0) кг")
                 Text("Цель: \(viewModel.goal?.rawValue ?? "—")")

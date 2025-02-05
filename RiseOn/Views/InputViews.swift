@@ -18,12 +18,15 @@ struct CustomTextField: View {
     var errorMessage: String? = nil
     var state: FieldState = .default
     var keyboardType: UIKeyboardType = .default
+    @FocusState private var isInputActive: Bool // Управление фокусом
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.subheadline)
-                .foregroundColor(state == .disabled ? .typographyDisabled : .white)
+            if !title.isEmpty {
+                Text(title)
+                    .font(.subheadline)
+                    .foregroundColor(state == .disabled ? .typographyDisabled : .white)
+            }
             
             TextField(placeholder, text: $text)
                 .padding()
@@ -34,7 +37,8 @@ struct CustomTextField: View {
                     RoundedRectangle(cornerRadius: 10)
                         .stroke(borderColor, lineWidth: 2)
                 )
-                .keyboardType(keyboardType)
+                .keyboardType(keyboardType) // Устанавливаем тип клавиатуры
+                .focused($isInputActive) // Управляем фокусом через FocusState
             
             if let errorMessage = errorMessage, state == .error {
                 Text(errorMessage)
@@ -43,8 +47,10 @@ struct CustomTextField: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: state)
+        
     }
-    
+
+
     // 🟢 Цвет фона
     private var fieldBackground: Color {
         state == .disabled ? .gray.opacity(0.3) : Color.card

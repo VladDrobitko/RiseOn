@@ -7,9 +7,9 @@
 
 import Foundation
 class SurveyViewModel: ObservableObject {
-    @Published var name: String? = nil
+    @Published var name: String = ""
     @Published var age: Int? = nil
-    @Published var gender: String? = nil
+    @Published var gender: Gender?
     @Published var goal: Goal?
     @Published var height: Int? = nil
     @Published var weight: Int? = nil
@@ -18,9 +18,11 @@ class SurveyViewModel: ObservableObject {
     
     
     
-    func saveGender(_ value: String) { gender = value }
+    func saveGender(_ value: Gender) { gender = value }
+    func saveGoal(_ value: Goal) { goal = value }
     func saveHeight(_ value: Int) { height = value }
     func saveWeight(_ value: Int) { weight = value }
     func saveExperience(_ value: String) { experience = value }
     func saveTargetWeight(_ value: Int) { targetWeight = value }
+    func saveName(_ value: String) { name = value }
 }

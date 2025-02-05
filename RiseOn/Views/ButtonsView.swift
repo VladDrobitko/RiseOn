@@ -135,25 +135,40 @@ struct Checkbox: View {
 // MARK: - Animated Tab Button
 struct TabButton: View {
     let title: String
+    var iconName: String? = nil // Опциональная иконка
     @Binding var isSelected: Bool
+    var cornerRadius: CGFloat = 25 // Позволяет менять скругление кнопки
     
     var body: some View {
-        Text(title)
-            .padding()
-            .frame(width: 100)
-            .background(isSelected ? LinearGradient.gradientDarkGreen : LinearGradient.gradientDarkGrey)
-            .overlay(
-                RoundedRectangle(cornerRadius: 25)
-                    .stroke(isSelected ? Color.primaryButton : Color.typographyDisabled, lineWidth: 1) // Граница чекбокса
-            )
-            .foregroundColor(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 25))
-            .animation(.spring(), value: isSelected)
-            .onTapGesture {
-                isSelected.toggle()
+        VStack {
+            if let iconName = iconName { // Если передана иконка, то показываем
+                Image(iconName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 25, height: 20)
+                    .foregroundColor(isSelected ? .typographyPrimary : .typographyGrey)
             }
+            
+            Text(title)
+                .font(.subheadline)
+                .foregroundColor(isSelected ? .typographyPrimary : .typographyGrey)
+                .padding(.top, iconName != nil ? 0.1 : 0) // Добавляем отступ только если есть иконка
+        }
+        .padding()
+        .frame(width: 90, height: 60)
+        .background(isSelected ? LinearGradient.gradientDarkGreen : LinearGradient.gradientDarkGrey)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius)) // Теперь можно менять радиус
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(isSelected ? Color.primaryButton : Color.gray, lineWidth: 0.5)
+        )
+        .onTapGesture {
+            isSelected.toggle()
+        }
+        .animation(.spring(), value: isSelected)
     }
 }
+
 
 // MARK: - Animated Selection Card
 struct SelectionCard: View {
