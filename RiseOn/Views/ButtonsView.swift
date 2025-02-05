@@ -26,16 +26,13 @@ struct CustomButton: View {
     let title: String
     @State private var isHovered = false
     var state: ButtonState = .normal
-    var action: () -> Void
+    var destination: AnyView // Параметр для передачи экрана назначения
     
     var body: some View {
-        Button(action: {
-            if state != .disabled {
-                action()
-            }
-        }) {
+        NavigationLink(destination: destination) {
             Text(title)
-                .font(.subheadline)
+                .font(.headline)
+                .fontWeight(.medium)
                 .padding()
                 .frame(maxWidth: .infinity)
                 .background(state.backgroundColor)
@@ -51,6 +48,7 @@ struct CustomButton: View {
         }
     }
 }
+
 
 // MARK: - Animated Toggle Switch
 struct CustomToggle: View {
