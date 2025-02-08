@@ -217,6 +217,7 @@ struct SegmentedControl: View {
             ForEach([UnitType.imperial, UnitType.metric], id: \.self) { unit in
                 Text(unit.rawValue)
                     .font(.subheadline)
+                    .fontWeight(.light)
                     .foregroundColor(selectedUnit == unit ? .white : .typographyGrey)
                     .frame(maxWidth: .infinity, minHeight: 32) // Гибкая ширина
                     .background(selectedUnit == unit ? LinearGradient.gradientDarkGreen : LinearGradient.gradientDarkGrey)

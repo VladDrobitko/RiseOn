@@ -6,6 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXCopyFilesBuildPhase section */
+		3F19BF2C2D56CF0B00513820 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		3FBFC13C2D4C081600F457A3 /* RiseOn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RiseOn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -68,6 +81,7 @@
 				3FBFC1382D4C081600F457A3 /* Sources */,
 				3FBFC1392D4C081600F457A3 /* Frameworks */,
 				3FBFC13A2D4C081600F457A3 /* Resources */,
+				3F19BF2C2D56CF0B00513820 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -107,6 +121,8 @@
 			);
 			mainGroup = 3FBFC1332D4C081500F457A3;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3FBFC13D2D4C081600F457A3 /* Products */;
 			projectDirPath = "";
