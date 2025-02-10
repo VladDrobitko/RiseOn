@@ -22,7 +22,8 @@ struct SurveyResult: View {
                 Text("Рост: \(viewModel.height ?? 0) см")
                 Text("Вес: \(viewModel.weight ?? 0) кг")
                 Text("Цель: \(viewModel.goal?.rawValue ?? "—")")
-                Text("Опыт: \(viewModel.experience ?? "—")")
+                Text("Опыт: \(viewModel.level ?? .lowActivity)")
+                Text("Диета: \(viewModel.diet ?? .keto)")
                 Text("Желаемый вес: \(viewModel.targetWeight ?? 0) кг")
                 
                 // Изменение для правильной работы с кнопкой

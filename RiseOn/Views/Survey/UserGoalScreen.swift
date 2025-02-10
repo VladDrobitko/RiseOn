@@ -7,20 +7,84 @@
 
 import SwiftUI
 
+struct UserGoalOptionView: View {
+    let goal: Goal
+    let isSelected: Bool
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 5) {
+                Text(goal.rawValue)
+                    .font(.headline)
+                    .fontWeight(.regular)
+                    .foregroundColor(.typographyPrimary)
+                Text(goal.description)
+                    .font(.subheadline)
+                    .fontWeight(.light)
+                    .foregroundColor(.typographyGrey)
+            }
+            Spacer()
+        }
+        .padding(13)
+        .frame(maxWidth: .infinity)
+        .background( isSelected ? LinearGradient.gradientDarkGreen : nil )
+        .background( !isSelected ? Color.card : nil)
+
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(isSelected ? Color.primaryButton : Color.gray, lineWidth: 0.5)
+        )
+
+        .cornerRadius(10)
+    }
+}
+
 struct UserGoalScreen: View {
-    @State private var selectedGoal: Goal? = nil
     @ObservedObject var viewModel: SurveyViewModel
     @Binding var currentStep: Int
     
     var body: some View {
         NavigationStack {
-            Text("Goal screen")
-            CustomButton(title: "Go", state: .normal, destination: AnyView(UserLevelScreen(viewModel: viewModel, currentStep: .constant(4))))
+            VStack(alignment: .leading) {
+                Text("What is your goal?")
+                    .font(.title3)
+                    .fontWeight(.light)
+                    .foregroundStyle(.typographyPrimary)
+                    .padding(.horizontal)
+                
+                VStack(spacing: 12) {
+                    ForEach(Goal.allCases, id: \.self) { goal in
+                        Button(action: {
+                            // Используем метод saveGoal для сохранения значения
+                            viewModel.saveGoal(goal)
+                        }) {
+                            UserGoalOptionView(goal: goal, isSelected: viewModel.goal == goal)
+                        }
+                        .padding(.horizontal)
+                    }
+                }
+                
+                
+                Spacer()
+                
+                CustomButton(
+                    title: "Next",
+                    state: viewModel.goal != nil ? .normal : .disabled,
+                    destination: AnyView(UserLevelScreen(viewModel: viewModel, currentStep: .constant(4)))
+                )
+                .padding()
+            }
+            .padding()
+            .navigationBarBackButtonHidden(true)
+            .customBackButton()
         }
-        .navigationBarBackButtonHidden(true)
-        .customBackButton()
     }
 }
+
+
+
+
+
 
 
 #Preview {
