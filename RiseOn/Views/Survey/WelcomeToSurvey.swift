@@ -47,7 +47,7 @@ struct WelcomeToSurvey: View {
                         CustomButton(title: "Let's start!", state: .normal, destination: AnyView(AboutUserScreen(viewModel: viewModel, currentStep: .constant(2))))
                             .padding(20)
                     }
-                    .padding(.bottom, 50)
+                    .padding(.bottom, 60)
                 }
             }
         }

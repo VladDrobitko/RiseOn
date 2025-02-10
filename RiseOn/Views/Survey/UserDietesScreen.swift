@@ -75,6 +75,7 @@ struct UserDietesScreen: View {
                 .padding()
             }
             .padding()
+            .background(Color.black.ignoresSafeArea())
             .navigationBarBackButtonHidden(true)
             .customBackButton()
         }

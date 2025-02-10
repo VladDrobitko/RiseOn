@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct UserPreferScreen: View {
     @ObservedObject var viewModel: SurveyViewModel
     @Binding var currentStep: Int
@@ -17,27 +18,32 @@ struct UserPreferScreen: View {
                 Text("Select your preferred training types:")
                     .font(.title3)
                     .fontWeight(.light)
-                    .foregroundStyle(.typographyPrimary)
+                    .foregroundColor(.primary) // Заменил .typographyPrimary на стандартный цвет
                     .padding(.horizontal)
                 
                 // Grid для отображения тегов
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 110))], spacing: 7) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))], spacing: 7) {
                     ForEach(Prefer.allCases, id: \.self) { type in
                         Button(action: {
                             viewModel.toggleSelection(for: type)
                         }) {
+                            // Определяем фоны и цвета текста заранее, чтобы улучшить производительность
+                            let isSelected = viewModel.selectedTrainingTypes.contains(type)
+                            let textColor: Color = isSelected ? .white : .typographyPrimary
+                            let borderColor: Color = isSelected ? Color.primaryButton : Color.gray
+                            
                             Text(type.rawValue)
                                 .font(.headline)
                                 .fontWeight(.regular)
                                 .padding(12)
                                 .frame(maxWidth: .infinity)
-                                .background(viewModel.selectedTrainingTypes.contains(type) ? LinearGradient.gradientDarkGreen : nil
-                                .background(viewModel.selectedTrainingTypes.contains(type) ? Color.card : nil)
-                                .foregroundColor(.typographyPrimary)
+                                .background( isSelected ? LinearGradient.gradientDarkGreen : nil )
+                                .background( !isSelected ? Color.card : nil)
+                                .foregroundColor(textColor)
                                 .cornerRadius(20)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 20)
-                                        .stroke(viewModel.selectedTrainingTypes.contains(type) ? Color.primaryButton : Color.gray, lineWidth: 0.5)
+                                        .stroke(borderColor, lineWidth: 0.5)
                                 )
                         }
                     }
@@ -55,12 +61,15 @@ struct UserPreferScreen: View {
                 .padding()
             }
             .padding()
+            .background(Color.black.ignoresSafeArea())
             .navigationBarBackButtonHidden(true)
             .customBackButton()
         }
     }
 }
 
+
+                                        
 
 #Preview {
     let viewModel = SurveyViewModel()
