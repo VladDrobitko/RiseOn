@@ -27,14 +27,12 @@ struct UserLevelOptionView: View {
         }
         .padding(13)
         .frame(maxWidth: .infinity)
-        .background( isSelected ? LinearGradient.gradientDarkGreen : nil )
-        .background( !isSelected ? Color.card : nil)
-
+        .background(isSelected ? LinearGradient.gradientDarkGreen : nil)
+        .background(!isSelected ? Color.card : nil)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(isSelected ? Color.primaryButton : Color.gray, lineWidth: 0.5)
         )
-
         .cornerRadius(10)
     }
 }
@@ -44,7 +42,9 @@ struct UserLevelScreen: View {
     @Binding var currentStep: Int
     
     var body: some View {
-        NavigationStack {
+        ZStack(alignment: .top) {
+            Color.black.ignoresSafeArea()
+            
             VStack(alignment: .leading) {
                 Text("What is your activity level?")
                     .font(.title3)
@@ -55,8 +55,10 @@ struct UserLevelScreen: View {
                 VStack(spacing: 12) {
                     ForEach(Level.allCases, id: \.self) { level in
                         Button(action: {
-                            // Используем метод saveGoal для сохранения значения
+                            // Сохраняем выбранный уровень активности
                             viewModel.saveLevel(level)
+                            // Разрешаем переход к следующему шагу
+                            viewModel.canProceedFromCurrentStep = true
                         }) {
                             UserLevelOptionView(level: level, isSelected: viewModel.level == level)
                         }
@@ -64,20 +66,13 @@ struct UserLevelScreen: View {
                     }
                 }
                 
-                
                 Spacer()
-                
-                CustomButton(
-                    title: "Next",
-                    state: viewModel.level != nil ? .normal : .disabled,
-                    destination: AnyView(UserPreferScreen(viewModel: viewModel, currentStep: .constant(5)))
-                )
-                .padding()
             }
             .padding()
-            .background(Color.black.ignoresSafeArea())
-            .navigationBarBackButtonHidden(true)
-            .customBackButton()
+            .onAppear {
+                // При появлении экрана проверяем, выбран ли уже уровень активности
+                viewModel.canProceedFromCurrentStep = viewModel.level != nil
+            }
         }
     }
 }

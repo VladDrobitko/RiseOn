@@ -7,18 +7,19 @@
 
 import SwiftUI
 
-
 struct UserPreferScreen: View {
     @ObservedObject var viewModel: SurveyViewModel
     @Binding var currentStep: Int
     
     var body: some View {
-        NavigationStack {
+        ZStack(alignment: .top) {
+            Color.black.ignoresSafeArea()
+            
             VStack(alignment: .leading) {
                 Text("Select your preferred training types:")
                     .font(.title3)
                     .fontWeight(.light)
-                    .foregroundColor(.primary) // Заменил .typographyPrimary на стандартный цвет
+                    .foregroundColor(.typographyPrimary)
                     .padding(.horizontal)
                 
                 // Grid для отображения тегов
@@ -26,6 +27,8 @@ struct UserPreferScreen: View {
                     ForEach(Prefer.allCases, id: \.self) { type in
                         Button(action: {
                             viewModel.toggleSelection(for: type)
+                            // Активируем кнопку "Продолжить", если хотя бы один тип выбран
+                            viewModel.canProceedFromCurrentStep = !viewModel.selectedTrainingTypes.isEmpty
                         }) {
                             // Определяем фоны и цвета текста заранее, чтобы улучшить производительность
                             let isSelected = viewModel.selectedTrainingTypes.contains(type)
@@ -37,8 +40,8 @@ struct UserPreferScreen: View {
                                 .fontWeight(.regular)
                                 .padding(12)
                                 .frame(maxWidth: .infinity)
-                                .background( isSelected ? LinearGradient.gradientDarkGreen : nil )
-                                .background( !isSelected ? Color.card : nil)
+                                .background(isSelected ? LinearGradient.gradientDarkGreen : nil)
+                                .background(!isSelected ? Color.card : nil)
                                 .foregroundColor(textColor)
                                 .cornerRadius(20)
                                 .overlay(
@@ -51,25 +54,15 @@ struct UserPreferScreen: View {
                 .padding()
                 
                 Spacer()
-                
-                // Кнопка "Далее" или "Сохранить"
-                CustomButton(
-                    title: "Next",
-                    state: viewModel.selectedTrainingTypes.isEmpty ? .disabled : .normal,
-                    destination: AnyView(UserDietesScreen(viewModel: viewModel, currentStep: .constant(6))) // Следующий экран
-                )
-                .padding()
             }
             .padding()
-            .background(Color.black.ignoresSafeArea())
-            .navigationBarBackButtonHidden(true)
-            .customBackButton()
+            .onAppear {
+                // При появлении экрана проверяем, выбран ли хотя бы один тип тренировки
+                viewModel.canProceedFromCurrentStep = !viewModel.selectedTrainingTypes.isEmpty
+            }
         }
     }
 }
-
-
-                                        
 
 #Preview {
     let viewModel = SurveyViewModel()

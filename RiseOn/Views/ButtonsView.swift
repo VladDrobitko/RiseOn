@@ -24,12 +24,12 @@ enum ButtonState {
 // MARK: - Custom Button with Animation
 struct CustomButton: View {
     let title: String
-    @State private var isHovered = false
     var state: ButtonState = .normal
-    var destination: AnyView // Параметр для передачи экрана назначения
-    
+    var action: (() -> Void)? = nil // Действие по нажатию
+    @State private var isHovered = false
+
     var body: some View {
-        NavigationLink(destination: destination) {
+        Button(action: { action?() }) {
             Text(title)
                 .font(.headline)
                 .fontWeight(.medium)
@@ -48,6 +48,7 @@ struct CustomButton: View {
         }
     }
 }
+
 
 
 // MARK: - Animated Toggle Switch
@@ -242,9 +243,77 @@ struct SegmentedControl: View {
 
 
 // MARK: - Preview
-struct ContentView_Previews: PreviewProvider {
+struct CustomComponents_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ZStack {
+            Color.black.edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 20) {
+                Text("Custom UI Components")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding(.bottom, 20)
+                
+                // Button Examples
+                CustomButton(title: "Normal Button", state: .normal) {
+                    print("Button tapped")
+                }
+                
+                CustomButton(title: "Disabled Button", state: .disabled) {
+                    print("This won't be called")
+                }
+                
+                // Toggle Example
+                HStack {
+                    Text("Toggle:")
+                        .foregroundColor(.white)
+                    CustomToggle(isOn: .constant(true))
+                }
+                .padding()
+                
+                // Radio Button Example
+                VStack(alignment: .leading) {
+                    RadioButton(title: "Selected Option", isSelected: .constant(true))
+                    RadioButton(title: "Unselected Option", isSelected: .constant(false))
+                }
+                .padding()
+                
+                // Checkbox Example
+                Checkbox(isChecked: .constant(true))
+                    .padding()
+                
+                // Tab Button Example
+                HStack {
+                    TabButton(
+                        title: "Male",
+                        iconName: "iconBoy",
+                        isSelected: .constant(true),
+                        cornerRadius: 20
+                    )
+                    
+                    TabButton(
+                        title: "Female",
+                        iconName: "iconGirl",
+                        isSelected: .constant(false),
+                        cornerRadius: 20
+                    )
+                }
+                
+                // Selection Card Example
+                SelectionCard(
+                    title: "Weight Loss",
+                    subtitle: "Lose weight and get fit",
+                    isSelected: .constant(true)
+                )
+                .padding(.horizontal)
+                
+                // Segmented Control
+                SegmentedControl(selectedUnit: .constant(.metric))
+            }
+            .padding()
+        }
+        .preferredColorScheme(.dark)
     }
 }
 

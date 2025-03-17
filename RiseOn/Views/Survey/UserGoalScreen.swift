@@ -27,14 +27,12 @@ struct UserGoalOptionView: View {
         }
         .padding(13)
         .frame(maxWidth: .infinity)
-        .background( isSelected ? LinearGradient.gradientDarkGreen : nil )
-        .background( !isSelected ? Color.card : nil)
-
+        .background(isSelected ? LinearGradient.gradientDarkGreen : nil)
+        .background(!isSelected ? Color.card : nil)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(isSelected ? Color.primaryButton : Color.gray, lineWidth: 0.5)
         )
-
         .cornerRadius(10)
     }
 }
@@ -44,7 +42,9 @@ struct UserGoalScreen: View {
     @Binding var currentStep: Int
     
     var body: some View {
-        NavigationStack {
+        ZStack(alignment: .top) {
+            Color.black.ignoresSafeArea()
+            
             VStack(alignment: .leading) {
                 Text("What is your goal?")
                     .font(.title3)
@@ -55,8 +55,10 @@ struct UserGoalScreen: View {
                 VStack(spacing: 12) {
                     ForEach(Goal.allCases, id: \.self) { goal in
                         Button(action: {
-                            // Используем метод saveGoal для сохранения значения
+                            // Сохраняем выбранную цель
                             viewModel.saveGoal(goal)
+                            // Активируем кнопку "Продолжить" в основном SurveyFlowView
+                            viewModel.canProceedFromCurrentStep = true
                         }) {
                             UserGoalOptionView(goal: goal, isSelected: viewModel.goal == goal)
                         }
@@ -64,29 +66,16 @@ struct UserGoalScreen: View {
                     }
                 }
                 
-                
                 Spacer()
-                
-                CustomButton(
-                    title: "Next",
-                    state: viewModel.goal != nil ? .normal : .disabled,
-                    destination: AnyView(UserLevelScreen(viewModel: viewModel, currentStep: .constant(4)))
-                )
-                .padding()
             }
             .padding()
-            .background(Color.black.ignoresSafeArea())
-            .navigationBarBackButtonHidden(true)
-            .customBackButton()
+            .onAppear {
+                // При появлении экрана проверяем, выбрана ли уже цель
+                viewModel.canProceedFromCurrentStep = viewModel.goal != nil
+            }
         }
     }
 }
-
-
-
-
-
-
 
 #Preview {
     let viewModel = SurveyViewModel()

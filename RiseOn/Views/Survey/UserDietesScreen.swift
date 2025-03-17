@@ -27,14 +27,12 @@ struct UserDietOptionView: View {
         }
         .padding(13)
         .frame(maxWidth: .infinity)
-        .background( isSelected ? LinearGradient.gradientDarkGreen : nil )
-        .background( !isSelected ? Color.card : nil)
-
+        .background(isSelected ? LinearGradient.gradientDarkGreen : nil)
+        .background(!isSelected ? Color.card : nil)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(isSelected ? Color.primaryButton : Color.gray, lineWidth: 0.5)
         )
-
         .cornerRadius(10)
     }
 }
@@ -44,7 +42,9 @@ struct UserDietesScreen: View {
     @Binding var currentStep: Int
     
     var body: some View {
-        NavigationStack {
+        ZStack(alignment: .top) {
+            Color.black.ignoresSafeArea()
+            
             VStack(alignment: .leading) {
                 Text("Do you follow any of these dietes?")
                     .font(.title3)
@@ -55,8 +55,10 @@ struct UserDietesScreen: View {
                 VStack(spacing: 12) {
                     ForEach(Diet.allCases, id: \.self) { diet in
                         Button(action: {
-                            // Используем метод saveGoal для сохранения значения
+                            // Сохраняем выбранную диету
                             viewModel.saveDiet(diet)
+                            // Обновляем состояние кнопки "Продолжить"
+                            viewModel.canProceedFromCurrentStep = true
                         }) {
                             UserDietOptionView(diet: diet, isSelected: viewModel.diet == diet)
                         }
@@ -64,20 +66,14 @@ struct UserDietesScreen: View {
                     }
                 }
                 
-                
                 Spacer()
-                
-                CustomButton(
-                    title: "Next",
-                    state: viewModel.diet != nil ? .normal : .disabled,
-                    destination: AnyView(WorkoutDaysScreen(viewModel: viewModel, currentStep: .constant(7)))
-                )
-                .padding()
             }
             .padding()
             .background(Color.black.ignoresSafeArea())
-            .navigationBarBackButtonHidden(true)
-            .customBackButton()
+            .onAppear {
+                // При появлении экрана проверяем, выбрана ли уже диета
+                viewModel.canProceedFromCurrentStep = viewModel.diet != nil
+            }
         }
     }
 }

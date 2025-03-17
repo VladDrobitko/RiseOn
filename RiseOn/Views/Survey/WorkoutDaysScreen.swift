@@ -8,17 +8,24 @@
 import SwiftUI
 
 struct WorkoutDaysScreen: View {
+    @Environment(\.dismiss) var dismiss
     @ObservedObject var viewModel: SurveyViewModel
     @Binding var currentStep: Int
+    @State private var isNextButtonDisabled = true
+    
+    let totalSteps = 6
     
     var body: some View {
-        NavigationStack {
-            Text("Workout")
-            CustomButton(title: "Go", state: .normal, destination: AnyView(SurveyResult(viewModel: viewModel, currentStep: .constant(8))))
+        ZStack(alignment: .top) {
+            Color.black.ignoresSafeArea()
+            VStack {
+                Text("Workout")
+                    .foregroundStyle(.white)
+                    .navigationBarBackButtonHidden(true)
+            }
         }
-        .navigationBarBackButtonHidden(true)
-        .customBackButton()
     }
+   
 }
 
 #Preview {

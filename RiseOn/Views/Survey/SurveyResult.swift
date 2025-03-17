@@ -10,50 +10,71 @@ import SwiftUI
 struct SurveyResult: View {
     @ObservedObject var viewModel: SurveyViewModel
     @Binding var currentStep: Int
-    @State private var showingAlert = false
 
     var body: some View {
-        NavigationStack {
-            VStack {
-                Text("Ваши ответы").font(.title)
-                Text("Имя: \(viewModel.name)")
-                Text("Возраст: \(viewModel.age ?? 0)")
-                Text("Пол: \(viewModel.gender ?? .male)")
-                Text("Рост: \(viewModel.height ?? 0) см")
-                Text("Вес: \(viewModel.weight ?? 0) кг")
-                Text("Цель: \(viewModel.goal?.rawValue ?? "—")")
-                Text("Опыт: \(viewModel.level ?? .lowActivity)")
-                Text("Диета: \(viewModel.diet ?? .keto)")
-                Text("Желаемый вес: \(viewModel.targetWeight ?? 0) кг")
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            VStack(spacing: 16) {
+                Text("Ваши ответы")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding(.bottom, 10)
                 
-                // Изменение для правильной работы с кнопкой
-                Button(action: {
-                    showingAlert = true
-                }) {
-                    CustomButton(title: "Завершить", state: .normal, destination: AnyView(MainView()))
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        resultRow(title: "Имя:", value: viewModel.name)
+                        resultRow(title: "Возраст:", value: "\(viewModel.age ?? 0)")
+                        resultRow(title: "Пол:", value: "\(viewModel.gender?.description ?? "—")")
+                        resultRow(title: "Рост:", value: "\(viewModel.height ?? 0) см")
+                        resultRow(title: "Вес:", value: "\(viewModel.weight ?? 0) кг")
+                        resultRow(title: "Цель:", value: viewModel.goal?.rawValue ?? "—")
+                        resultRow(title: "Опыт:", value: viewModel.level?.rawValue ?? "—")
+                        resultRow(title: "Диета:", value: viewModel.diet?.rawValue ?? "—")
+                        resultRow(title: "Желаемый вес:", value: "\(viewModel.targetWeight ?? 0) кг")
+                        
+                        if !viewModel.selectedTrainingTypes.isEmpty {
+                            Text("Предпочтения тренировок:")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding(.top, 5)
+                            
+                            ForEach(Array(viewModel.selectedTrainingTypes), id: \.self) { type in
+                                Text("• \(type.rawValue)")
+                                    .foregroundColor(.white)
+                                    .padding(.leading)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(Color.card)
+                    .cornerRadius(10)
+                    .padding(.horizontal)
                 }
-                .padding()
+            }
+            .padding()
+            .onAppear {
+                // Разрешаем завершение опроса
+                viewModel.canProceedFromCurrentStep = true
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .customBackButton()
-//        .alert(isPresented: $showingAlert) {
-//            Alert(
-//                title: Text("Ваш план составлен"),
-//                message: Text("Вы можете просмотреть его в разделе 'Мой план' на главном экране."),
-//                dismissButton: .default(Text("Ок"), action: {
-//                    // По нажатию на "Ок" выполняем переход
-//                    currentStep = 0 // Если нужно сбросить шаги
-//                })
-//            )
-//        }
+    }
+    
+    private func resultRow(title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.white)
+            Spacer()
+            Text(value)
+                .foregroundColor(.white.opacity(0.8))
+        }
     }
 }
 
-
-
-
 #Preview {
     let viewModel = SurveyViewModel()
-    return SurveyResult(viewModel: viewModel, currentStep: .constant(6))
+    return SurveyResult(viewModel: viewModel, currentStep: .constant(8))
+        .background(Color.black)
 }

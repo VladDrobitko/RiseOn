@@ -8,44 +8,51 @@
 import SwiftUI
 
 struct StartScreenView: View {
+    @EnvironmentObject var coordinator: AppCoordinator
+    
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Image("Start")
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
-                
+        ZStack {
+            Image("Start")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+            
+            VStack {
                 VStack {
-                    VStack {
-                        Image("logoRiseOn")
-                    }
-                    .padding(.top, 70)
-                    
-                    Spacer()
-                    
-                    VStack(spacing: 20) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 20) {
-                                Text("Welcome to RiseOn!")
-                                    .font(.largeTitle)
-                                    .foregroundStyle(.typographyPrimary)
-                                
-                                Text("Create your account to get a personalized plan.")
-                                    .font(.title2)
-                                    .foregroundStyle(.typographyPrimary)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 20)
-                        }
-                        .frame(maxWidth: .infinity)
-                        
-                        
-                        CustomButton(title: "Create", state: .normal, destination: AnyView(SurveyView()))
-                        .padding(20)
-                    }
-                    .padding(.bottom, 50)
+                    Image("logoRiseOn")
                 }
+                .padding(.top, 70)
+                
+                Spacer()
+                
+                VStack(spacing: 20) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 20) {
+                            Text("Welcome to RiseOn!")
+                                .font(.largeTitle)
+                                .foregroundStyle(.typographyPrimary)
+                            
+                            Text("Create your account to get a personalized plan.")
+                                .font(.title2)
+                                .foregroundStyle(.typographyPrimary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                    }
+                    .frame(maxWidth: .infinity)
+                    
+                    CustomButton(
+                        title: "Get Started",
+                        state: .normal
+                    ) {
+                        // Открываем авторизацию как sheet
+                        coordinator.markAppAsLaunched()
+                        coordinator.showAuthSheet = true
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 60)
             }
         }
     }
@@ -53,5 +60,8 @@ struct StartScreenView: View {
 
 
 #Preview {
-    StartScreenView()
+    let coordinator = AppCoordinator()
+    return StartScreenView()
+        .environmentObject(coordinator)
+        .preferredColorScheme(.dark)
 }

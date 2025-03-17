@@ -6,12 +6,29 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
-struct RiseOnApp: App {
+struct FitAppApp: App {
+    // Интегрируем SwiftData на уровне приложения
+    var sharedModelContainer: ModelContainer = {
+        let schema = Schema([UserProfileModel.self])
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        
+        do {
+            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+        } catch {
+            fatalError("Не удалось создать ModelContainer: \(error)")
+        }
+    }()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // Используем AppFlowView как единую точку входа
+            AppFlowView()
         }
+        .modelContainer(sharedModelContainer)
     }
 }
+
+
