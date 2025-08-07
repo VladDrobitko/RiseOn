@@ -104,13 +104,13 @@ class AppCoordinator: ObservableObject {
         
         switch currentScreen {
         case .splash:
-            // После сплэш-экрана переходим на нужный экран в зависимости от состояния
+            // ИСПРАВЛЕНИЕ: После сплэша всегда показываем Welcome экран при первом запуске
             if isFirstLaunch {
                 print("Going to welcome screen (first launch)")
                 currentScreen = .welcome
             } else if !isLoggedIn {
-                print("Going to auth screen (not logged in)")
-                currentScreen = .auth
+                print("Going to welcome screen (not logged in)")
+                currentScreen = .welcome // Изменено с .auth на .welcome
             } else if !hasSurveyCompleted {
                 print("Going to survey screen (survey not completed)")
                 currentScreen = .survey
@@ -120,9 +120,8 @@ class AppCoordinator: ObservableObject {
             }
             
         case .welcome:
-            // При нажатии кнопки на welcome screen открываем sheet авторизации
-            print("Opening auth sheet from welcome screen")
-            showAuthSheet = true
+            // Welcome экран сам решает когда показать авторизацию через showAuthSheet
+            print("Welcome screen handles auth flow")
             
         case .auth:
             // После авторизации
@@ -190,7 +189,7 @@ class AppCoordinator: ObservableObject {
         print("User logged in")
         isLoggedIn = true
         UserDefaults.standard.set(true, forKey: "isLoggedIn")
-        showAuthSheet = false
+        showAuthSheet = false // Закрываем sheet
         
         if !hasSurveyCompleted {
             print("Going to survey after login")

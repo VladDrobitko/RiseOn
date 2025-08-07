@@ -10,9 +10,13 @@ import SwiftUI
 struct WelcomeToSurvey: View {
     @ObservedObject var viewModel: SurveyViewModel
     @EnvironmentObject var coordinator: AppCoordinator
+    @State private var animateContent = false
+    @State private var animateSteps = false
+    @State private var currentStepIndex = 0
+    @State private var autoScrollTimer: Timer?
     
     var body: some View {
-        ZStack(alignment: .bottom) { // Задаем выравнивание ZStack по нижнему краю
+        ZStack(alignment: .bottom) {
             // Фоновое изображение
             Image("Welcom ro Riseon!")
                 .resizable()
@@ -20,37 +24,228 @@ struct WelcomeToSurvey: View {
                 .ignoresSafeArea()
             
             VStack {
-                // Логотип вверху экрана
+                // Логотип вверху экрана с анимацией
                 VStack {
                     Image("logoRiseOn")
+                        .scaleEffect(animateContent ? 1.0 : 0.8)
+                        .opacity(animateContent ? 1.0 : 0.0)
                 }
                 .padding(.top, 70)
                 
                 Spacer()
                 
-                // Текстовый блок снизу экрана
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("Welcome to RiseOn!")
-                        .font(.largeTitle)
-                        .foregroundStyle(.typographyPrimary)
+                // Основной контент с анимацией
+                VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Welcome to RiseOn!")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.typographyPrimary)
+                            .scaleEffect(animateContent ? 1.0 : 0.9)
+                            .opacity(animateContent ? 1.0 : 0.0)
+                        
+                        Text("We'll ask you 4 quick questions to create your personalized fitness plan")
+                            .font(.title3)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.typographyPrimary)
+                            .opacity(animateContent ? 1.0 : 0.0)
+                    }
+                    .padding(.horizontal)
                     
-                    Text("We will ask you some questions to better help you achieve your goal.")
-                        .font(.title2)
-                        .foregroundStyle(.typographyPrimary)
+                    // Preview шагов как слайд-галерея
+                    VStack(spacing: 12) {
+                        // Заголовок галереи
+                        HStack {
+                            Text("Quick Preview")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.white)
+                            
+                            Spacer()
+                            
+                            Text("Swipe to see steps →")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.horizontal, 20)
+                        .opacity(animateSteps ? 1.0 : 0.0)
+                        
+                        // Горизонтальная прокрутка с ScrollViewReader для программной прокрутки
+                        ScrollViewReader { proxy in
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+                                    ForEach(Array(surveySteps.enumerated()), id: \.offset) { index, step in
+                                        HStack(spacing: 8) {
+                                            // Иконка с номером
+                                            ZStack {
+                                                Circle()
+                                                    .fill(
+                                                        currentStepIndex == index ?
+                                                        LinearGradient.gradientDarkGreen :
+                                                        LinearGradient.gradientCard
+                                                    )
+                                                    .frame(width: 50, height: 50)
+                                                
+                                                VStack(spacing: 2) {
+                                                    Image(systemName: step.icon)
+                                                        .font(.system(size: 24, weight: .medium))
+                                                        .foregroundColor(.white)
+                                                }
+                                            }
+                                            .padding(.leading, 15)
+                                            
+                                            Spacer()
+                                            
+                                            // Информация
+                                            VStack(spacing: 4) {
+                                                Text(step.title)
+                                                    .font(.subheadline)
+                                                    .fontWeight(.semibold)
+                                                    .foregroundColor(.white)
+                                                    .multilineTextAlignment(.center)
+                                                    .lineLimit(1)
+                                                
+                                                Text(step.description)
+                                                    .font(.caption)
+                                                    .foregroundColor(.gray)
+                                                    .multilineTextAlignment(.center)
+                                                    .lineLimit(2)
+                                            }
+                                            .frame(width: 180)
+                                        }
+                                        .padding(.vertical, 12)
+                                        .padding(.horizontal, 8)
+                                        .frame(width: 280, height: 90)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(Color.black.opacity(0.3))
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 12)
+                                                        .stroke(
+                                                            currentStepIndex == index ?
+                                                            Color.primaryButton.opacity(0.4) :
+                                                            Color.primaryButton.opacity(0.1),
+                                                            lineWidth: 1
+                                                        )
+                                                )
+                                        )
+                                        .scaleEffect(
+                                            animateSteps ?
+                                            (currentStepIndex == index ? 1.05 : 1.0) : 0.8
+                                        )
+                                        .opacity(animateSteps ? 1.0 : 0.0)
+                                        .animation(.easeOut(duration: 0.4).delay(Double(index) * 0.1), value: animateSteps)
+                                        .animation(.easeInOut(duration: 0.3), value: currentStepIndex)
+                                        .id("card_\(index)") // Уникальный ID для ScrollViewReader
+                                        .onTapGesture {
+                                            stopAutoScroll() // Останавливаем автоскролл при ручном взаимодействии
+                                            withAnimation(.easeInOut(duration: 0.3)) {
+                                                currentStepIndex = index
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                            }
+                            .onAppear {
+                                // Центрируем первую карточку при появлении
+                                proxy.scrollTo("card_0", anchor: .center)
+                            }
+                            .onChange(of: currentStepIndex) { _, newIndex in
+                                // Программная прокрутка при изменении индекса (автоскролл)
+                                withAnimation(.easeInOut(duration: 0.6)) {
+                                    proxy.scrollTo("card_\(newIndex)", anchor: .center)
+                                }
+                            }
+                        }
+                        .frame(height: 100)
+                        
+                        // Индикатор страниц (точки) - теперь интерактивный
+                        HStack(spacing: 6) {
+                            ForEach(0..<4, id: \.self) { index in
+                                Circle()
+                                    .fill(index == currentStepIndex ? Color.primaryButton : Color.white.opacity(0.3))
+                                    .frame(width: 6, height: 6)
+                                    .animation(.easeInOut(duration: 0.2), value: currentStepIndex)
+                                    .onTapGesture {
+                                        stopAutoScroll()
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                            currentStepIndex = index
+                                        }
+                                    }
+                            }
+                        }
+                        .opacity(animateSteps ? 1.0 : 0.0)
+                    }
+                    
+                    // Время завершения
+                    HStack {
+                        Image(systemName: "clock")
+                            .font(.system(size: 14))
+                            .foregroundColor(.primaryButton)
+                        
+                        Text("Takes about 2 minutes")
+                            .font(.footnote)
+                            .fontWeight(.medium)
+                            .foregroundColor(.gray)
+                        
+                        Spacer()
+                        
+                        HStack(spacing: 4) {
+                            ForEach(0..<4, id: \.self) { index in
+                                Circle()
+                                    .fill(index == currentStepIndex ? Color.primaryButton : Color.white.opacity(0.3))
+                                    .frame(width: 6, height: 6)
+                                    .animation(.easeInOut(duration: 0.2), value: currentStepIndex)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 8)
+                    .opacity(animateContent ? 1.0 : 0.0)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
-                .padding(.bottom, 140) // Увеличиваем отступ снизу для кнопки
+                .padding(.bottom, 140)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal)
             
-            // Кнопка будет размещена внизу благодаря alignment: .bottom у ZStack
-            CustomButton(
-                title: "Продолжить",
-                state: .normal
-            ) {
-                coordinator.currentSurveyStep += 1
+            // Кнопка с улучшенным дизайном
+            VStack(spacing: 12) {
+                Button {
+                    // Легкая вибрация для тактильной обратной связи
+                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                    impactFeedback.impactOccurred()
+                    
+                    coordinator.currentSurveyStep += 1
+                } label: {
+                    HStack {
+                        Text("Let's Get Started")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 16, weight: .semibold))
+                    }
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.primaryButton, Color.primaryButton.opacity(0.8)]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(16)
+                    .shadow(color: Color.primaryButton.opacity(0.3), radius: 8, x: 0, y: 4)
+                }
+                .scaleEffect(animateContent ? 1.0 : 0.9)
+                .opacity(animateContent ? 1.0 : 0.0)
+                
+                // Дополнительная информация
+                Text("No account required to start")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                    .opacity(animateContent ? 1.0 : 0.0)
             }
             .padding(.horizontal, 32)
             .padding(.bottom, 60)
@@ -58,14 +253,80 @@ struct WelcomeToSurvey: View {
         .onAppear {
             // Активируем кнопку "Продолжить"
             viewModel.canProceedFromCurrentStep = true
+            
+            // Запускаем анимации
+            withAnimation(.easeOut(duration: 0.6)) {
+                animateContent = true
+            }
+            
+            // Анимация шагов с задержкой
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                animateSteps = true
+            }
+            
+            // Автоматическая смена слайдов
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                startAutoScroll()
+            }
         }
+        .onDisappear {
+            autoScrollTimer?.invalidate()
+        }
+    }
+    
+    // MARK: - Auto Scroll Methods
+    private func startAutoScroll() {
+        autoScrollTimer = Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) { _ in
+            withAnimation(.easeInOut(duration: 0.5)) {
+                currentStepIndex = (currentStepIndex + 1) % 4
+            }
+        }
+    }
+    
+    private func stopAutoScroll() {
+        autoScrollTimer?.invalidate()
+        autoScrollTimer = nil
+    }
+    
+    // MARK: - Survey Steps Data
+    private var surveySteps: [SurveyStep] {
+        [
+            SurveyStep(
+                title: "Personal Info",
+                description: "Tell us about yourself",
+                icon: "person.circle"
+            ),
+            SurveyStep(
+                title: "Your Goals",
+                description: "What you want to achieve",
+                icon: "target"
+            ),
+            SurveyStep(
+                title: "Activity Level",
+                description: "How active you are",
+                icon: "figure.run"
+            ),
+            SurveyStep(
+                title: "Preferences",
+                description: "Your workout style",
+                icon: "heart.fill"
+            )
+        ]
     }
 }
 
-// Предварительный просмотр для разработки
+// MARK: - Supporting Models
+struct SurveyStep {
+    let title: String
+    let description: String
+    let icon: String
+}
+
 #Preview {
     let viewModel = SurveyViewModel()
+    let coordinator = AppCoordinator()
     return WelcomeToSurvey(viewModel: viewModel)
+        .environmentObject(coordinator)
         .background(Color.black)
         .preferredColorScheme(.dark)
 }

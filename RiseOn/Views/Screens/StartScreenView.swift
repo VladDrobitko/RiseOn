@@ -25,24 +25,98 @@ struct StartScreenView: View {
                 
                 Spacer()
                 
-                VStack(spacing: 20) {
+                VStack(spacing: 24) {
                     HStack {
-                        VStack(alignment: .leading, spacing: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
                             Text("Welcome to RiseOn!")
                                 .font(.largeTitle)
+                                .fontWeight(.bold)
                                 .foregroundStyle(.typographyPrimary)
                             
-                            Text("Create your account to get a personalized plan.")
-                                .font(.title2)
+                            Text("Get your personalized workout and nutrition plan in just 2 minutes")
+                                .font(.title3)
+                                .fontWeight(.medium)
                                 .foregroundStyle(.typographyPrimary)
+                                .lineLimit(3)
+                                .multilineTextAlignment(.leading)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                     }
                     .frame(maxWidth: .infinity)
                     
+                    // Preview что будет дальше
+                    VStack(spacing: 12) {
+                        HStack(spacing: 16) {
+                            Image(systemName: "person.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.primaryButton)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Personal Info")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.white)
+                                Text("Tell us about yourself")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        HStack(spacing: 16) {
+                            Image(systemName: "target")
+                                .font(.title2)
+                                .foregroundColor(.primaryButton)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Your Goals")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.white)
+                                Text("What do you want to achieve?")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        HStack(spacing: 16) {
+                            Image(systemName: "heart.fill")
+                                .font(.title2)
+                                .foregroundColor(.primaryButton)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Preferences")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.white)
+                                Text("Choose your favorite workouts")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal, 20)
+                    }
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.black.opacity(0.3))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                            )
+                    )
+                    .padding(.horizontal)
+                    
                     CustomButton(
-                        title: "Get Started",
+                        title: "Start Your Journey",
                         state: .normal
                     ) {
                         // Открываем авторизацию как sheet
@@ -50,6 +124,12 @@ struct StartScreenView: View {
                         coordinator.showAuthSheet = true
                     }
                     .padding(.horizontal)
+                    
+                    // Добавляем текст о времени
+                    Text("Takes less than 2 minutes")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                        .padding(.top, 8)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 60)
@@ -57,7 +137,6 @@ struct StartScreenView: View {
         }
     }
 }
-
 
 #Preview {
     let coordinator = AppCoordinator()

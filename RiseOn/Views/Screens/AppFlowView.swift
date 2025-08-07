@@ -52,8 +52,9 @@ struct AppFlowView: View {
         .sheet(isPresented: $coordinator.showAuthSheet) {
             AuthView()
                 .environmentObject(coordinator)
-                .presentationDetents([.fraction(0.5)])
+                .presentationDetents([.medium, .large]) // Адаптивная высота
                 .presentationDragIndicator(.visible)
+                .presentationBackground(.clear) // Убираем стандартный фон
         }
         
         .onAppear {
