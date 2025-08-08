@@ -12,7 +12,7 @@ struct AuthMainScreen: View {
     @ObservedObject var authCoordinator: AuthCoordinator
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 30) {
             // Header
             VStack(spacing: 6) {
                 Text("Join RiseOn")
@@ -27,7 +27,7 @@ struct AuthMainScreen: View {
             }
             
             // Social login buttons
-            VStack(spacing: 10) {
+            VStack(spacing: 15) {
                 // Apple Sign In
                 Button {
                     handleAppleSignIn()
@@ -43,7 +43,7 @@ struct AuthMainScreen: View {
                             .fontWeight(.medium)
                     }
                     .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, minHeight: 40)
+                    .frame(maxWidth: .infinity, minHeight: 50)
                     .background(Color.black)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
@@ -75,7 +75,7 @@ struct AuthMainScreen: View {
                             .fontWeight(.medium)
                     }
                     .foregroundColor(.black)
-                    .frame(maxWidth: .infinity, minHeight: 40)
+                    .frame(maxWidth: .infinity, minHeight: 50)
                     .background(Color.white)
                     .cornerRadius(8)
                 }
@@ -94,7 +94,7 @@ struct AuthMainScreen: View {
                                 .fontWeight(.medium)
                         }
                         .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .frame(maxWidth: .infinity, minHeight: 50)
                         .background(Color.card)
                         .cornerRadius(8)
                     }
@@ -111,7 +111,7 @@ struct AuthMainScreen: View {
                                 .fontWeight(.medium)
                         }
                         .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .frame(maxWidth: .infinity, minHeight: 50)
                         .background(Color.primaryButton.opacity(0.2))
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)

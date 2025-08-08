@@ -24,25 +24,39 @@ struct WelcomeToSurvey: View {
                 .ignoresSafeArea()
             
             VStack {
-                // Логотип вверху экрана с анимацией
+                // НОВЫЙ ТУЛБАР С КНОПКОЙ НАЗАД
+                HStack {
+                    // Кнопка назад
+                    Button {
+                        coordinator.currentScreen = .welcome
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white)
+                            .padding(.horizontal)
+                            
+                    }
+                    .scaleEffect(animateContent ? 1.0 : 0.8)
+                    .opacity(animateContent ? 1.0 : 0.0)
+                    
+                    Spacer()
+                }
+                .padding(.horizontal)
+                .padding(.top, 60)
+                
+                // Логотип
                 VStack {
                     Image("logoRiseOn")
                         .scaleEffect(animateContent ? 1.0 : 0.8)
                         .opacity(animateContent ? 1.0 : 0.0)
                 }
-                .padding(.top, 70)
+                .padding(.top, 40)
                 
                 Spacer()
                 
                 // Основной контент с анимацией
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 5) {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Welcome to RiseOn!")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.typographyPrimary)
-                            .scaleEffect(animateContent ? 1.0 : 0.9)
-                            .opacity(animateContent ? 1.0 : 0.0)
                         
                         Text("We'll ask you 4 quick questions to create your personalized fitness plan")
                             .font(.title3)
@@ -70,7 +84,7 @@ struct WelcomeToSurvey: View {
                         .padding(.horizontal, 20)
                         .opacity(animateSteps ? 1.0 : 0.0)
                         
-                        // Горизонтальная прокрутка с ScrollViewReader для программной прокрутки
+                        // Горизонтальная прокрутка с ScrollViewReader
                         ScrollViewReader { proxy in
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
@@ -116,29 +130,23 @@ struct WelcomeToSurvey: View {
                                         .padding(.vertical, 12)
                                         .padding(.horizontal, 8)
                                         .frame(width: 280, height: 90)
-                                        .background(
+                                        .background(.ultraThinMaterial)
+                                        .cornerRadius(12)
+                                        .overlay(
                                             RoundedRectangle(cornerRadius: 12)
-                                                .fill(Color.black.opacity(0.3))
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 12)
-                                                        .stroke(
-                                                            currentStepIndex == index ?
-                                                            Color.primaryButton.opacity(0.4) :
-                                                            Color.primaryButton.opacity(0.1),
-                                                            lineWidth: 1
-                                                        )
+                                                .stroke(
+                                                    currentStepIndex == index ?
+                                                        Color.primaryButton.opacity(0.6) :
+                                                        Color.white.opacity(0.1),
+                                                    lineWidth: 0.8
                                                 )
-                                        )
-                                        .scaleEffect(
-                                            animateSteps ?
-                                            (currentStepIndex == index ? 1.05 : 1.0) : 0.8
                                         )
                                         .opacity(animateSteps ? 1.0 : 0.0)
                                         .animation(.easeOut(duration: 0.4).delay(Double(index) * 0.1), value: animateSteps)
                                         .animation(.easeInOut(duration: 0.3), value: currentStepIndex)
-                                        .id("card_\(index)") // Уникальный ID для ScrollViewReader
+                                        .id("card_\(index)")
                                         .onTapGesture {
-                                            stopAutoScroll() // Останавливаем автоскролл при ручном взаимодействии
+                                            stopAutoScroll()
                                             withAnimation(.easeInOut(duration: 0.3)) {
                                                 currentStepIndex = index
                                             }
@@ -148,11 +156,9 @@ struct WelcomeToSurvey: View {
                                 .padding(.horizontal, 20)
                             }
                             .onAppear {
-                                // Центрируем первую карточку при появлении
                                 proxy.scrollTo("card_0", anchor: .center)
                             }
                             .onChange(of: currentStepIndex) { _, newIndex in
-                                // Программная прокрутка при изменении индекса (автоскролл)
                                 withAnimation(.easeInOut(duration: 0.6)) {
                                     proxy.scrollTo("card_\(newIndex)", anchor: .center)
                                 }
@@ -160,7 +166,7 @@ struct WelcomeToSurvey: View {
                         }
                         .frame(height: 100)
                         
-                        // Индикатор страниц (точки) - теперь интерактивный
+                        // Индикатор страниц (точки)
                         HStack(spacing: 6) {
                             ForEach(0..<4, id: \.self) { index in
                                 Circle()
@@ -178,31 +184,7 @@ struct WelcomeToSurvey: View {
                         .opacity(animateSteps ? 1.0 : 0.0)
                     }
                     
-                    // Время завершения
-                    HStack {
-                        Image(systemName: "clock")
-                            .font(.system(size: 14))
-                            .foregroundColor(.primaryButton)
-                        
-                        Text("Takes about 2 minutes")
-                            .font(.footnote)
-                            .fontWeight(.medium)
-                            .foregroundColor(.gray)
-                        
-                        Spacer()
-                        
-                        HStack(spacing: 4) {
-                            ForEach(0..<4, id: \.self) { index in
-                                Circle()
-                                    .fill(index == currentStepIndex ? Color.primaryButton : Color.white.opacity(0.3))
-                                    .frame(width: 6, height: 6)
-                                    .animation(.easeInOut(duration: 0.2), value: currentStepIndex)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 8)
-                    .opacity(animateContent ? 1.0 : 0.0)
+                    .padding(.vertical, 16)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
@@ -212,7 +194,6 @@ struct WelcomeToSurvey: View {
             // Кнопка с улучшенным дизайном
             VStack(spacing: 12) {
                 Button {
-                    // Легкая вибрация для тактильной обратной связи
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                     impactFeedback.impactOccurred()
                     
@@ -240,31 +221,22 @@ struct WelcomeToSurvey: View {
                 }
                 .scaleEffect(animateContent ? 1.0 : 0.9)
                 .opacity(animateContent ? 1.0 : 0.0)
-                
-                // Дополнительная информация
-                Text("No account required to start")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-                    .opacity(animateContent ? 1.0 : 0.0)
+                .padding(.bottom, 20)
             }
             .padding(.horizontal, 32)
             .padding(.bottom, 60)
         }
         .onAppear {
-            // Активируем кнопку "Продолжить"
             viewModel.canProceedFromCurrentStep = true
             
-            // Запускаем анимации
             withAnimation(.easeOut(duration: 0.6)) {
                 animateContent = true
             }
             
-            // Анимация шагов с задержкой
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 animateSteps = true
             }
             
-            // Автоматическая смена слайдов
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 startAutoScroll()
             }

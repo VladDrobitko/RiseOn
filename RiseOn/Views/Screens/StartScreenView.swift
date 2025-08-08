@@ -33,7 +33,7 @@ struct StartScreenView: View {
                                 .fontWeight(.bold)
                                 .foregroundStyle(.typographyPrimary)
                             
-                            Text("Get your personalized workout and nutrition plan in just 2 minutes")
+                            Text("Achieve your best shape with workouts and nutrition plans made just for you.")
                                 .font(.title3)
                                 .fontWeight(.medium)
                                 .foregroundStyle(.typographyPrimary)
@@ -53,11 +53,11 @@ struct StartScreenView: View {
                                 .foregroundColor(.primaryButton)
                             
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Personal Info")
+                                Text("Personalized Training")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                     .foregroundColor(.white)
-                                Text("Tell us about yourself")
+                                Text("Plan that fits your goals & level")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
@@ -72,18 +72,19 @@ struct StartScreenView: View {
                                 .foregroundColor(.primaryButton)
                             
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Your Goals")
+                                Text("Smart Nutrition Guide")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                     .foregroundColor(.white)
-                                Text("What do you want to achieve?")
+                                Text("Easy and tasty meals to fuel your progress")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
                             
                             Spacer()
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.leading, 20)
+                        .padding(.trailing, 10)
                         
                         HStack(spacing: 16) {
                             Image(systemName: "heart.fill")
@@ -91,26 +92,27 @@ struct StartScreenView: View {
                                 .foregroundColor(.primaryButton)
                             
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Preferences")
+                                Text("Progress Tracking")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                     .foregroundColor(.white)
-                                Text("Choose your favorite workouts")
+                                Text("Track progress & stay motivated")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
                             
                             Spacer()
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.leading, 20)
+                        .padding(.trailing, 10)
                     }
                     .padding(.vertical, 16)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.black.opacity(0.3))
+                            .fill(.ultraThinMaterial)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16)
-                                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                                    .stroke(Color.white.opacity(0.1), lineWidth: 0.5)
                             )
                     )
                     .padding(.horizontal)
@@ -125,11 +127,7 @@ struct StartScreenView: View {
                     }
                     .padding(.horizontal)
                     
-                    // Добавляем текст о времени
-                    Text("Takes less than 2 minutes")
-                        .font(.footnote)
-                        .foregroundColor(.gray)
-                        .padding(.top, 8)
+                    .padding(.bottom, 30)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 60)
