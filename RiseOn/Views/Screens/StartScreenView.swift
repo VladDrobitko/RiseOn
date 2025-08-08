@@ -48,7 +48,7 @@ struct StartScreenView: View {
                     // Preview что будет дальше
                     VStack(spacing: 12) {
                         HStack(spacing: 16) {
-                            Image(systemName: "person.circle.fill")
+                            Image(systemName: "figure.run.circle.fill")
                                 .font(.title2)
                                 .foregroundColor(.primaryButton)
                             
@@ -67,7 +67,7 @@ struct StartScreenView: View {
                         .padding(.horizontal, 20)
                         
                         HStack(spacing: 16) {
-                            Image(systemName: "target")
+                            Image(systemName: "fork.knife.circle.fill")
                                 .font(.title2)
                                 .foregroundColor(.primaryButton)
                             
@@ -87,7 +87,7 @@ struct StartScreenView: View {
                         .padding(.trailing, 10)
                         
                         HStack(spacing: 16) {
-                            Image(systemName: "heart.fill")
+                            Image(systemName: "chart.line.uptrend.xyaxis.circle.fill")
                                 .font(.title2)
                                 .foregroundColor(.primaryButton)
                             
