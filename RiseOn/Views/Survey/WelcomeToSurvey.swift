@@ -9,11 +9,11 @@ import SwiftUI
 
 struct WelcomeToSurvey: View {
     @ObservedObject var viewModel: SurveyViewModel
-    @EnvironmentObject var coordinator: AppCoordinator
     @State private var animateContent = false
     @State private var animateSteps = false
     @State private var currentStepIndex = 0
     @State private var autoScrollTimer: Timer?
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -28,7 +28,7 @@ struct WelcomeToSurvey: View {
                 HStack {
                     // Кнопка назад
                     Button {
-                        coordinator.currentScreen = .welcome
+                        dismiss()
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 16, weight: .medium))
@@ -197,7 +197,9 @@ struct WelcomeToSurvey: View {
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                     impactFeedback.impactOccurred()
                     
-                    coordinator.currentSurveyStep += 1
+                    // TODO: Перейти к следующему шагу опроса
+                    // Пока просто закрываем экран
+                    dismiss()
                 } label: {
                     HStack {
                         Text("Let's Get Started")

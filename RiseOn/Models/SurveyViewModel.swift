@@ -70,10 +70,3 @@ class SurveyViewModel: ObservableObject {
                !selectedTrainingTypes.isEmpty
     }
 }
-
-
-
-
-
-
-

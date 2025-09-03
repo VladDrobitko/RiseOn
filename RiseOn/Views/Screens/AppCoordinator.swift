@@ -14,7 +14,6 @@ class AppCoordinator: ObservableObject {
         case splash          // Сплэш-экран
         case welcome         // Экран приветствия
         case auth            // Авторизация
-        case survey          // Опрос
         case main            // Главный экран
     }
     
@@ -28,13 +27,9 @@ class AppCoordinator: ObservableObject {
     // Состояния пользователя
     @Published var isFirstLaunch: Bool = true
     @Published var isLoggedIn: Bool = false
-    @Published var hasSurveyCompleted: Bool = false
     
     // Состояние для модальных окон
     @Published var showAuthSheet: Bool = false
-    
-    // Состояние для шага опроса
-    @Published var currentSurveyStep: Int = 1
     
     // Доступ к SwiftData
     private var modelContext: ModelContext?
@@ -47,21 +42,7 @@ class AppCoordinator: ObservableObject {
         self.isFirstLaunch = !UserDefaults.standard.bool(forKey: "hasLaunchedBefore")
         self.isLoggedIn = UserDefaults.standard.bool(forKey: "isLoggedIn")
         
-        // Проверяем наличие профиля в SwiftData
-        if let context = modelContext {
-            do {
-                let descriptor = FetchDescriptor<UserProfileModel>()
-                let profiles = try context.fetch(descriptor)
-                self.hasSurveyCompleted = !profiles.isEmpty
-            } catch {
-                print("Failed to fetch profiles: \(error)")
-                self.hasSurveyCompleted = false
-            }
-        } else {
-            self.hasSurveyCompleted = UserDefaults.standard.bool(forKey: "isSurveyCompleted")
-        }
-        
-        print("AppCoordinator initialized with states - isFirstLaunch: \(isFirstLaunch), isLoggedIn: \(isLoggedIn), hasSurveyCompleted: \(hasSurveyCompleted)")
+        print("AppCoordinator initialized with states - isFirstLaunch: \(isFirstLaunch), isLoggedIn: \(isLoggedIn)")
         
         // Определяем начальный экран
         determineInitialScreen()
@@ -70,26 +51,7 @@ class AppCoordinator: ObservableObject {
     // Метод для обновления ModelContext после инициализации
     func updateModelContext(_ context: ModelContext) {
         self.modelContext = context
-        
-        // Проверяем профили снова с новым контекстом
-        do {
-            let descriptor = FetchDescriptor<UserProfileModel>()
-            let profiles = try context.fetch(descriptor)
-            let hasProfiles = !profiles.isEmpty
-            
-            // Обновляем состояние только если оно отличается
-            if hasProfiles != hasSurveyCompleted {
-                print("Updating hasSurveyCompleted from \(hasSurveyCompleted) to \(hasProfiles) based on SwiftData")
-                self.hasSurveyCompleted = hasProfiles
-                
-                // Обновляем экран, если находимся на сплэш-экране
-                if currentScreen == .splash {
-                    determineInitialScreen()
-                }
-            }
-        } catch {
-            print("Failed to fetch profiles with updated context: \(error)")
-        }
+        print("ModelContext updated")
     }
     
     private func determineInitialScreen() {
@@ -104,76 +66,25 @@ class AppCoordinator: ObservableObject {
         
         switch currentScreen {
         case .splash:
-            // ИСПРАВЛЕНИЕ: После сплэша всегда показываем Welcome экран при первом запуске
-            if isFirstLaunch {
-                print("Going to welcome screen (first launch)")
-                currentScreen = .welcome
-            } else if !isLoggedIn {
-                print("Going to welcome screen (not logged in)")
-                currentScreen = .welcome // Изменено с .auth на .welcome
-            } else if !hasSurveyCompleted {
-                print("Going to survey screen (survey not completed)")
-                currentScreen = .survey
-            } else {
-                print("Going to main screen (all completed)")
-                currentScreen = .main
-            }
+            // После сплэша всегда показываем Welcome экран
+            print("Going to welcome screen")
+            currentScreen = .welcome
             
         case .welcome:
             // Welcome экран сам решает когда показать авторизацию через showAuthSheet
             print("Welcome screen handles auth flow")
             
         case .auth:
-            // После авторизации
+            // После авторизации сразу переходим к основному приложению
             print("Completing auth flow")
             isLoggedIn = true
             UserDefaults.standard.set(true, forKey: "isLoggedIn")
-            
-            if !hasSurveyCompleted {
-                print("Going to survey after auth")
-                currentScreen = .survey
-            } else {
-                print("Going to main after auth")
-                currentScreen = .main
-            }
-            
-        case .survey:
-            // После завершения опроса
-            print("Completing survey flow")
-            hasSurveyCompleted = true
-            UserDefaults.standard.set(true, forKey: "isSurveyCompleted")
             currentScreen = .main
             
         case .main:
             // Уже на главном экране
             print("Already on main screen")
             break
-        }
-    }
-    
-    // После завершения опроса
-    func completeSurvey() {
-        print("Survey completed")
-        hasSurveyCompleted = true
-        UserDefaults.standard.set(true, forKey: "isSurveyCompleted")
-        currentScreen = .main
-    }
-    
-    // Метод для сохранения профиля пользователя
-    func saveUserProfile(_ profile: UserProfileModel) {
-        guard let context = modelContext else {
-            print("Cannot save profile: modelContext is nil")
-            return
-        }
-        
-        context.insert(profile)
-        
-        do {
-            try context.save()
-            print("User profile saved successfully")
-            hasSurveyCompleted = true
-        } catch {
-            print("Failed to save user profile: \(error)")
         }
     }
     
@@ -190,14 +101,7 @@ class AppCoordinator: ObservableObject {
         isLoggedIn = true
         UserDefaults.standard.set(true, forKey: "isLoggedIn")
         showAuthSheet = false // Закрываем sheet
-        
-        if !hasSurveyCompleted {
-            print("Going to survey after login")
-            currentScreen = .survey
-        } else {
-            print("Going to main after login")
-            currentScreen = .main
-        }
+        currentScreen = .main
     }
     
     // Сброс состояния приложения
@@ -206,13 +110,10 @@ class AppCoordinator: ObservableObject {
         // Сбрасываем все состояния
         isFirstLaunch = true
         isLoggedIn = false
-        hasSurveyCompleted = false
-        currentSurveyStep = 1
         
         // Очищаем UserDefaults
         UserDefaults.standard.removeObject(forKey: "hasLaunchedBefore")
         UserDefaults.standard.removeObject(forKey: "isLoggedIn")
-        UserDefaults.standard.removeObject(forKey: "isSurveyCompleted")
         
         // Удаляем данные из SwiftData
         if let context = modelContext {

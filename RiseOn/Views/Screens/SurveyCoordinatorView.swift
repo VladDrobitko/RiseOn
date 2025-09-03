@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct SurveyCoordinatorView: View {
-    @EnvironmentObject var coordinator: AppCoordinator
     @ObservedObject var viewModel: SurveyViewModel
+    @State private var currentStep: Int = 1
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         NavigationStack {
@@ -18,7 +19,7 @@ struct SurveyCoordinatorView: View {
                 
                 // Отображаем нужный экран в зависимости от текущего шага опроса
                 Group {
-                    switch coordinator.currentSurveyStep {
+                    switch currentStep {
                     case 1:
                         WelcomeToSurvey(viewModel: viewModel)
                             .transition(.opacity)
@@ -50,11 +51,11 @@ struct SurveyCoordinatorView: View {
                 
                 VStack {
                     // Тулбар для шагов 2-8
-                    if coordinator.currentSurveyStep > 1 {
-                        CustomToolbar(currentStep: coordinator.currentSurveyStep - 1, totalSteps: 7) {
-                            if coordinator.currentSurveyStep > 1 {
+                    if currentStep > 1 {
+                        CustomToolbar(currentStep: currentStep - 1, totalSteps: 7) {
+                            if currentStep > 1 {
                                 withAnimation {
-                                    coordinator.currentSurveyStep -= 1
+                                    currentStep -= 1
                                 }
                             }
                         }
@@ -64,40 +65,39 @@ struct SurveyCoordinatorView: View {
                     Spacer()
                     
                     // Кнопка "Продолжить"/"Завершить"
-                    // Кнопка "Продолжить"/"Завершить"
-                    if coordinator.currentSurveyStep > 1 {
+                    if currentStep > 1 {
                         CustomButton(
-                            title: coordinator.currentSurveyStep == 8 ? "Завершить" : "Продолжить",
-                            state: coordinator.currentSurveyStep == 1 || viewModel.canProceedFromCurrentStep ? .normal : .disabled
+                            title: currentStep == 8 ? "Завершить" : "Продолжить",
+                            state: currentStep == 1 || viewModel.canProceedFromCurrentStep ? .normal : .disabled
                         ) {
-                            if coordinator.currentSurveyStep < 8 {
+                            if currentStep < 8 {
                                 // На первом экране кнопка всегда активна
-                                if coordinator.currentSurveyStep == 1 {
+                                if currentStep == 1 {
                                     viewModel.canProceedFromCurrentStep = false
                                 }
                                 
                                 // Переходим к следующему шагу
                                 withAnimation {
-                                    coordinator.currentSurveyStep += 1
+                                    currentStep += 1
                                 }
                             } else {
                                 // Завершаем опрос
-                                viewModel.saveResults()
-                                coordinator.completeSurvey()
+                                self.viewModel.saveResults()
+                                // TODO: Сохранить результаты в профиль
+                                dismiss()
                             }
                         }
-                        .padding(.horizontal)  // Одинаковый отступ по горизонтали как в других экранах
-                        .padding(.bottom, 30)  // Нижний отступ, чтобы кнопка не была слишком близко к краю
+                        .padding(.horizontal)
+                        .padding(.bottom, 30)
                     }
-                    
                 }
-                .padding(.horizontal) 
+                .padding(.horizontal)
             }
         }
         .navigationBarHidden(true)
         .onAppear {
             // При появлении экрана активируем кнопку для первого шага
-            if coordinator.currentSurveyStep == 1 {
+            if currentStep == 1 {
                 viewModel.canProceedFromCurrentStep = true
             }
         }
@@ -106,12 +106,7 @@ struct SurveyCoordinatorView: View {
 
 #Preview {
     let surveyViewModel = SurveyViewModel()
-    let coordinator = AppCoordinator()
-    
-    // Настраиваем начальный шаг опроса для тестирования
-    coordinator.currentSurveyStep = 2
     
     return SurveyCoordinatorView(viewModel: surveyViewModel)
-        .environmentObject(coordinator)
         .preferredColorScheme(.dark)
 }

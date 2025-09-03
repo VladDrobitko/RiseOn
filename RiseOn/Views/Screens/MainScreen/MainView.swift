@@ -9,97 +9,52 @@ import SwiftUI
 import Combine
 
 struct MainView: View {
-    // Используем @StateObject для глобального состояния, доступного всем вкладкам
+    @EnvironmentObject var coordinator: AppCoordinator
+    @EnvironmentObject var tabCoordinator: TabCoordinator
     @StateObject private var viewModel = MainViewModel()
     
-    // Сохраняем выбранную вкладку для оптимизации перерисовок
-    @State private var selectedTab = 0
-    
     var body: some View {
-            
-            TabView(selection: $selectedTab) {
-                // Главная страница
-                MainPage()
-                    .environmentObject(viewModel)
-                    .tag(0)
-                    .tabItem {
-                        Image("main")
-                            .renderingMode(.template)
-                        Text("Main")
-                    }
-                
-                // Тренировки
-                WorkoutPage()
-                    .environmentObject(viewModel)
-                    .tag(1)
-                    .tabItem {
-                        Image("workout")
-                            .renderingMode(.template)
-                        Text("Workout")
-                    }
-                
-                // Питание
-                NutritionPage()
-                    .environmentObject(viewModel)
-                    .tag(2)
-                    .tabItem {
-                        Image("nutrition")
-                            .renderingMode(.template)
-                        Text("Nutrition")
-                    }
-                
-                // Прогресс
-                ProgressPage()
-                    .environmentObject(viewModel)
-                    .tag(3)
-                    .tabItem {
-                        Image("stats")
-                            .renderingMode(.template)
-                        Text("Progress")
-                    }
+        ZStack {
+            // Основной контент в зависимости от выбранной вкладки
+            Group {
+                switch tabCoordinator.selectedTab {
+                case 0:
+                    MainPage()
+                        .environmentObject(viewModel)
+                        .environmentObject(coordinator)
+                case 1:
+                    WorkoutPage()
+                        .environmentObject(viewModel)
+                        .environmentObject(coordinator)
+                case 2:
+                    NutritionPage()
+                        .environmentObject(viewModel)
+                        .environmentObject(coordinator)
+                case 3:
+                    ProgressPage()
+                        .environmentObject(viewModel)
+                        .environmentObject(coordinator)
+                default:
+                    MainPage()
+                        .environmentObject(viewModel)
+                        .environmentObject(coordinator)
+                }
             }
-            .accentColor(Color("PrimaryColor")) // Цвет выбранной вкладки
-            .onAppear {
-                // Настройка внешнего вида TabView
-                let appearance = UITabBarAppearance()
-                appearance.backgroundColor = .black
-                
-                // Увеличиваем размер иконок и текста
-                let iconConfig = UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold)
-                
-                // Настройка размера для невыбранных элементов
-                appearance.stackedLayoutAppearance.normal.iconColor = UIColor.lightGray
-                appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
-                    NSAttributedString.Key.font: UIFont.systemFont(ofSize: 12, weight: .medium),
-                    NSAttributedString.Key.foregroundColor: UIColor.lightGray
-                ]
-                
-                // Настройка размера для выбранных элементов
-                appearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color.primaryButton)
-                appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
-                    NSAttributedString.Key.font: UIFont.systemFont(ofSize: 12, weight: .regular),
-                    NSAttributedString.Key.foregroundColor: UIColor(Color.primaryButton)
-                ]
-                
-                // Увеличиваем отступы для большего пространства
-                appearance.stackedLayoutAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -2)
-                appearance.stackedLayoutAppearance.selected.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -2)
-                
-                // Применяем настройки
-                UITabBar.appearance().standardAppearance = appearance
-                UITabBar.appearance().scrollEdgeAppearance = appearance
-                
-                // Дополнительно: увеличиваем общую высоту TabBar
-                UITabBar.appearance().itemPositioning = .centered
-                UITabBar.appearance().itemSpacing = 16
-                
-                // Инициализация данных
-                viewModel.initializeData()
-            }
-            
+            .animation(.easeInOut(duration: 0.3), value: tabCoordinator.selectedTab)
         }
-        
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black.edgesIgnoringSafeArea(.all))
+        .onAppear {
+            viewModel.initializeData()
+        }
+        .onReceive(coordinator.$currentScreen) { screen in
+            // Сбрасываем выбранную вкладку при изменении экрана
+            if screen == .main {
+                tabCoordinator.switchToTab(0)
+            }
+        }
     }
+}
 
 // ViewModel с использованием Combine для обработки данных
 class MainViewModel: ObservableObject {
@@ -201,4 +156,7 @@ struct ProgressEntry {
 // MARK: - Предварительный просмотр
 #Preview {
     MainView()
+        .environmentObject(AppCoordinator())
+        .environmentObject(TabCoordinator())
+        .preferredColorScheme(.dark)
 }
