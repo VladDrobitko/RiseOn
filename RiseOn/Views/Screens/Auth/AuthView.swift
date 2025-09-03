@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AuthView: View {
-    @EnvironmentObject var coordinator: AppCoordinator
+    @EnvironmentObject var appState: AppState
     @StateObject private var authCoordinator = AuthCoordinator()
     
     var body: some View {
@@ -61,7 +61,7 @@ struct AuthView: View {
 
 // MARK: - Forgot Password Screen (простой экран)
 struct AuthForgotPasswordScreen: View {
-    @EnvironmentObject var appCoordinator: AppCoordinator
+    @EnvironmentObject var appState: AppState
     @ObservedObject var authCoordinator: AuthCoordinator
     @State private var email = ""
     @State private var isLoading = false
@@ -195,7 +195,7 @@ struct AuthForgotPasswordScreen: View {
 struct AuthView_Previews: PreviewProvider {
     static var previews: some View {
         AuthView()
-            .environmentObject(AppCoordinator())
+            .environmentObject(AppState())
             .preferredColorScheme(.dark)
             .frame(height: 400)
     }

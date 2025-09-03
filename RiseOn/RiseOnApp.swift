@@ -24,8 +24,7 @@ struct FitAppApp: App {
     
     var body: some Scene {
         WindowGroup {
-            // Используем MainContainer как единую точку входа
-            MainContainer()
+            MainApp()
         }
         .modelContainer(sharedModelContainer)
     }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AuthEmailSignUpScreen: View {
-    @EnvironmentObject var appCoordinator: AppCoordinator
+    @EnvironmentObject var appState: AppState
     @ObservedObject var authCoordinator: AuthCoordinator
     @State private var email = ""
     @State private var password = ""
@@ -207,7 +207,7 @@ struct AuthEmailSignUpScreen: View {
                     errorMessage = "An account with this email already exists"
                 }
             } else {
-                appCoordinator.login()
+                appState.login()
             }
         }
     }

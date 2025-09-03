@@ -298,9 +298,10 @@ struct SurveyStep {
 
 #Preview {
     let viewModel = SurveyViewModel()
-    let coordinator = AppCoordinator()
-    return WelcomeToSurvey(viewModel: viewModel)
-        .environmentObject(coordinator)
+    let appState = AppState()
+    
+    WelcomeToSurvey(viewModel: viewModel)
+        .environmentObject(appState)
         .background(Color.black)
         .preferredColorScheme(.dark)
 }

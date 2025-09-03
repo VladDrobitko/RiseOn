@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AuthEmailSignInScreen: View {
-    @EnvironmentObject var appCoordinator: AppCoordinator
+    @EnvironmentObject var appState: AppState
     @ObservedObject var authCoordinator: AuthCoordinator
     @State private var email = ""
     @State private var password = ""
@@ -182,7 +182,7 @@ struct AuthEmailSignInScreen: View {
             
             // Simple validation (replace with real auth)
             if email.lowercased() == "test@test.com" && password == "123456" {
-                appCoordinator.login()
+                appState.login()
             } else {
                 withAnimation {
                     errorMessage = "Invalid email or password"

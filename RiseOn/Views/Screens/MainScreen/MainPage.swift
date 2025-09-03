@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct MainPage: View {
-    @EnvironmentObject var viewModel: MainViewModel
-    @EnvironmentObject var coordinator: AppCoordinator
-    @EnvironmentObject var tabCoordinator: TabCoordinator
+    @EnvironmentObject var appState: AppState
     
     var body: some View {
         VStack(spacing: 20) {
@@ -21,20 +19,16 @@ struct MainPage: View {
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 
-                if let profile = viewModel.userProfile {
-                    Text("Привет, \(profile.name)!")
-                        .font(.title2)
-                        .foregroundColor(.typographyPrimary)
-                }
+                Text("Добро пожаловать в RiseOn!")
+                    .font(.title2)
+                    .foregroundColor(.typographyPrimary)
             }
             .padding(.top, 40)
             
             // Основной контент
             VStack(spacing: 24) {
-                // Карточка с информацией о пользователе
-                if let profile = viewModel.userProfile {
-                    UserInfoCard(profile: profile)
-                }
+                // Информационная карточка (временная заглушка)
+                InfoCard()
                 
                 // Быстрые действия
                 QuickActionsSection()
@@ -48,37 +42,33 @@ struct MainPage: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black.edgesIgnoringSafeArea(.all))
+        .navigationTitle("Home")
+        .navigationBarTitleDisplayMode(.large)
     }
 }
 
-// MARK: - User Info Card
-struct UserInfoCard: View {
-    let profile: UserProfile
-    
+// MARK: - Info Card (временная заглушка)
+struct InfoCard: View {
     var body: some View {
         VStack(spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Ваш профиль")
+                    Text("Добро пожаловать!")
                         .font(.headline)
                         .foregroundColor(.white)
                     
-                    Text("Возраст: \(profile.age) лет")
+                    Text("Начните свой путь к здоровому образу жизни")
                         .font(.subheadline)
                         .foregroundColor(.typographyGrey)
                     
-                    Text("Вес: \(profile.weight, specifier: "%.1f") кг")
-                        .font(.subheadline)
-                        .foregroundColor(.typographyGrey)
-                    
-                    Text("Рост: \(profile.height, specifier: "%.0f") см")
-                        .font(.subheadline)
+                    Text("Пройдите опрос в профиле для персонального плана")
+                        .font(.caption)
                         .foregroundColor(.typographyGrey)
                 }
                 
                 Spacer()
                 
-                Image(systemName: "person.circle.fill")
+                Image(systemName: "figure.run.circle.fill")
                     .font(.system(size: 50))
                     .foregroundColor(.primaryButton)
             }
@@ -97,8 +87,6 @@ struct UserInfoCard: View {
 
 // MARK: - Quick Actions Section
 struct QuickActionsSection: View {
-    @EnvironmentObject var tabCoordinator: TabCoordinator
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Быстрые действия")
@@ -111,7 +99,9 @@ struct QuickActionsSection: View {
                     icon: "figure.run",
                     color: .primaryButton
                 ) {
-                    tabCoordinator.switchToTab(1)
+                    // В новой архитектуре TabView автоматически переключает табы
+                    // Действие будет добавлено позже через NavigationLink
+                    print("Тренировка - пока заглушка")
                 }
                 
                 QuickActionButton(
@@ -119,7 +109,7 @@ struct QuickActionsSection: View {
                     icon: "fork.knife",
                     color: .hoverButton
                 ) {
-                    tabCoordinator.switchToTab(2)
+                    print("Питание - пока заглушка")
                 }
                 
                 QuickActionButton(
@@ -127,7 +117,7 @@ struct QuickActionsSection: View {
                     icon: "chart.line.uptrend.xyaxis",
                     color: .focusedButton
                 ) {
-                    tabCoordinator.switchToTab(3)
+                    print("Прогресс - пока заглушка")
                 }
             }
         }
@@ -221,13 +211,9 @@ struct StatCard: View {
 }
 
 #Preview {
-    let mainViewModel = MainViewModel()
-    let coordinator = AppCoordinator()
-    let tabCoordinator = TabCoordinator()
+    let appState = AppState()
     
-    return MainPage()
-        .environmentObject(mainViewModel)
-        .environmentObject(coordinator)
-        .environmentObject(tabCoordinator)
+    MainPage()
+        .environmentObject(appState)
         .preferredColorScheme(.dark)
 }

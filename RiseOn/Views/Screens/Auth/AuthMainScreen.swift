@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AuthMainScreen: View {
-    @EnvironmentObject var appCoordinator: AppCoordinator
+    @EnvironmentObject var appState: AppState
     @ObservedObject var authCoordinator: AuthCoordinator
     
     var body: some View {
@@ -156,7 +156,7 @@ struct AuthMainScreen: View {
                 }
                 
                 Button {
-                    appCoordinator.showAuthSheet = false
+                    appState.showAuthSheet = false
                 } label: {
                     Text("Maybe Later")
                         .font(.subheadline)
@@ -177,15 +177,15 @@ struct AuthMainScreen: View {
     
     // MARK: - Auth Methods
     func handleAppleSignIn() {
-        appCoordinator.login()
+        appState.login()
     }
-    
+
     func handleGoogleSignIn() {
-        appCoordinator.login()
+        appState.login()
     }
-    
+
     func handleGuestMode() {
-        appCoordinator.showAuthSheet = false
-        appCoordinator.login()
+        appState.showAuthSheet = false
+        appState.login()
     }
 }

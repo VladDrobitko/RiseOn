@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StartScreenView: View {
-    @EnvironmentObject var coordinator: AppCoordinator
+    @EnvironmentObject var appState: AppState
     
     var body: some View {
         ZStack {
@@ -121,9 +121,8 @@ struct StartScreenView: View {
                         title: "Start Your Journey",
                         state: .normal
                     ) {
-                        // Открываем авторизацию как sheet
-                        coordinator.markAppAsLaunched()
-                        coordinator.showAuthSheet = true
+                        appState.markFirstLaunchCompleted()
+                        
                     }
                     .padding(.horizontal)
                     
@@ -137,8 +136,8 @@ struct StartScreenView: View {
 }
 
 #Preview {
-    let coordinator = AppCoordinator()
-    return StartScreenView()
-        .environmentObject(coordinator)
-        .preferredColorScheme(.dark)
+   let appState = AppState()
+   return StartScreenView()
+       .environmentObject(appState)
+       .preferredColorScheme(.dark)
 }

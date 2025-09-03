@@ -62,7 +62,7 @@ struct MainTabInterface: View {
                     .applyAppStyle()
             }
             .tabItem {
-                Image("workout")  
+                Image("workout")
                 Text("Workout")
             }
             .tag(1)
