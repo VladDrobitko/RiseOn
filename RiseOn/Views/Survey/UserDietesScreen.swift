@@ -7,36 +7,6 @@
 
 import SwiftUI
 
-struct UserDietOptionView: View {
-    let diet: Diet
-    let isSelected: Bool
-    
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 5) {
-                Text(diet.rawValue)
-                    .font(.headline)
-                    .fontWeight(.regular)
-                    .foregroundColor(.typographyPrimary)
-                Text(diet.description)
-                    .font(.subheadline)
-                    .fontWeight(.light)
-                    .foregroundColor(.typographyGrey)
-            }
-            Spacer()
-        }
-        .padding(13)
-        .frame(maxWidth: .infinity)
-        .background(isSelected ? LinearGradient.gradientDarkGreen : nil)
-        .background(!isSelected ? Color.card : nil)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(isSelected ? Color.primaryButton : Color.gray, lineWidth: 0.5)
-        )
-        .cornerRadius(10)
-    }
-}
-
 struct UserDietesScreen: View {
     @ObservedObject var viewModel: SurveyViewModel
     @Binding var currentStep: Int
@@ -45,40 +15,125 @@ struct UserDietesScreen: View {
         ZStack(alignment: .top) {
             Color.black.ignoresSafeArea()
             
-            VStack(alignment: .leading) {
-                Text("Do you follow any of these dietes?")
-                    .font(.title3)
-                    .fontWeight(.light)
-                    .foregroundStyle(.typographyPrimary)
-                    .padding(.horizontal)
-                
-                VStack(spacing: 12) {
+            SurveyStepCard(
+                title: "Do you follow any of these diets?",
+                subtitle: "This helps us suggest appropriate meal plans and recipes"
+            ) {
+                VStack(spacing: DesignTokens.Spacing.md) {
                     ForEach(Diet.allCases, id: \.self) { diet in
-                        Button(action: {
-                            // Сохраняем выбранную диету
+                        DietOptionCard(
+                            diet: diet,
+                            isSelected: viewModel.diet == diet
+                        ) {
                             viewModel.saveDiet(diet)
-                            // Обновляем состояние кнопки "Продолжить"
                             viewModel.canProceedFromCurrentStep = true
-                        }) {
-                            UserDietOptionView(diet: diet, isSelected: viewModel.diet == diet)
                         }
-                        .padding(.horizontal)
+                        .padding(.horizontal, DesignTokens.Padding.screen)
                     }
                 }
-                
-                Spacer()
-            }
-            .padding()
-            .background(Color.black.ignoresSafeArea())
-            .onAppear {
-                // При появлении экрана проверяем, выбрана ли уже диета
-                viewModel.canProceedFromCurrentStep = viewModel.diet != nil
             }
         }
+        .onAppear {
+            viewModel.canProceedFromCurrentStep = viewModel.diet != nil
+        }
+    }
+}
+
+// MARK: - Diet Option Card
+struct DietOptionCard: View {
+    let diet: Diet
+    let isSelected: Bool
+    let action: () -> Void
+    
+    private var icon: String {
+        switch diet {
+        case .vegetarian: return "leaf.fill"
+        case .vegan: return "carrot.fill"
+        case .keto: return "fish.fill"
+        case .mediterranean: return "drop.fill"
+        case .noAnyDietes: return "xmark.circle"
+        }
+    }
+    
+    private var color: Color {
+        switch diet {
+        case .vegetarian: return .green
+        case .vegan: return .mint
+        case .keto: return .orange
+        case .mediterranean: return .blue
+        case .noAnyDietes: return .gray
+        }
+    }
+    
+    private var tag: String? {
+        switch diet {
+        case .vegetarian: return "Popular"
+        case .keto: return "Low Carb"
+        case .mediterranean: return "Heart Healthy"
+        default: return nil
+        }
+    }
+    
+    var body: some View {
+        RiseOnCard(
+            style: isSelected ? .gradient : .basic,
+            size: .large,
+            onTap: action
+        ) {
+            HStack(spacing: DesignTokens.Spacing.lg) {
+                // Icon
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.2))
+                        .frame(width: 50, height: 50)
+                    
+                    Image(systemName: icon)
+                        .font(.system(size: DesignTokens.Sizes.iconMedium))
+                        .foregroundColor(isSelected ? color : .typographyGrey)
+                }
+                
+                // Content
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                    HStack {
+                        Text(diet.rawValue)
+                            .riseOnHeading4()
+                            .foregroundColor(.typographyPrimary)
+                        
+                        if let tag = tag {
+                            Text(tag)
+                                .riseOnCaption(.medium)
+                                .foregroundColor(color)
+                                .padding(.horizontal, DesignTokens.Spacing.sm)
+                                .padding(.vertical, DesignTokens.Spacing.xs)
+                                .background(color.opacity(0.2))
+                                .cornerRadius(DesignTokens.CornerRadius.xs)
+                        }
+                        
+                        Spacer()
+                    }
+                    
+                    Text(diet.description)
+                        .riseOnBodySmall()
+                        .foregroundColor(.typographyGrey)
+                        .lineLimit(2)
+                }
+                
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.primaryButton)
+                }
+            }
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
+                .stroke(isSelected ? color : Color.clear, lineWidth: 2)
+        )
     }
 }
 
 #Preview {
     let viewModel = SurveyViewModel()
     return UserDietesScreen(viewModel: viewModel, currentStep: .constant(6))
+        .preferredColorScheme(.dark)
 }

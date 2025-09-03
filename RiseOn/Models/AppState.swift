@@ -39,16 +39,24 @@ class AppState: ObservableObject {
     
     /// Пользователь успешно авторизовался
     func login() {
-        isAuthenticated = true
+        // ИСПРАВЛЕНО: Сначала закрываем модальное окно, потом меняем состояние
         showAuthSheet = false
-        UserDefaults.standard.set(true, forKey: "isAuthenticated")
-        checkSurveyCompletion()
+        
+        // Небольшая задержка для плавного закрытия модального окна
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.isAuthenticated = true
+            UserDefaults.standard.set(true, forKey: "isAuthenticated")
+            self.checkSurveyCompletion()
+        }
     }
     
     /// Выход из аккаунта
     func logout() {
         isAuthenticated = false
         hasCompletedSurvey = false
+        isFirstLaunch = false
+        showAuthSheet = false
+        
         UserDefaults.standard.removeObject(forKey: "isAuthenticated")
         UserDefaults.standard.removeObject(forKey: "hasCompletedSurvey")
     }
@@ -56,7 +64,6 @@ class AppState: ObservableObject {
     /// Отметка о завершении первого запуска
     func markFirstLaunchCompleted() {
         isFirstLaunch = false
-        showAuthSheet = true // Показываем Sheet сразу
         UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
     }
     
@@ -89,9 +96,8 @@ class AppState: ObservableObject {
         isFirstLaunch = !UserDefaults.standard.bool(forKey: "hasLaunchedBefore")
         hasCompletedSurvey = UserDefaults.standard.bool(forKey: "hasCompletedSurvey")
         
-        // Для тестирования сбрасываем на первый запуск
-        // TODO: Уберите эту строку после тестирования
-        isFirstLaunch = true
+        // Для тестирования можно временно включить
+        // isFirstLaunch = true
     }
     
     private func checkSurveyCompletion() {

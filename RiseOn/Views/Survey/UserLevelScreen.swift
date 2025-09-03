@@ -7,36 +7,6 @@
 
 import SwiftUI
 
-struct UserLevelOptionView: View {
-    let level: Level
-    let isSelected: Bool
-    
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 5) {
-                Text(level.rawValue)
-                    .font(.headline)
-                    .fontWeight(.regular)
-                    .foregroundColor(.typographyPrimary)
-                Text(level.description)
-                    .font(.subheadline)
-                    .fontWeight(.light)
-                    .foregroundColor(.typographyGrey)
-            }
-            Spacer()
-        }
-        .padding(13)
-        .frame(maxWidth: .infinity)
-        .background(isSelected ? LinearGradient.gradientDarkGreen : nil)
-        .background(!isSelected ? Color.card : nil)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(isSelected ? Color.primaryButton : Color.gray, lineWidth: 0.5)
-        )
-        .cornerRadius(10)
-    }
-}
-
 struct UserLevelScreen: View {
     @ObservedObject var viewModel: SurveyViewModel
     @Binding var currentStep: Int
@@ -45,39 +15,108 @@ struct UserLevelScreen: View {
         ZStack(alignment: .top) {
             Color.black.ignoresSafeArea()
             
-            VStack(alignment: .leading) {
-                Text("What is your activity level?")
-                    .font(.title3)
-                    .fontWeight(.light)
-                    .foregroundStyle(.typographyPrimary)
-                    .padding(.horizontal)
-                
-                VStack(spacing: 12) {
+            SurveyStepCard(
+                title: "What is your activity level?",
+                subtitle: "This helps us create the right workout intensity for you"
+            ) {
+                VStack(spacing: DesignTokens.Spacing.md) {
                     ForEach(Level.allCases, id: \.self) { level in
-                        Button(action: {
-                            // Сохраняем выбранный уровень активности
+                        ActivityLevelCard(
+                            level: level,
+                            isSelected: viewModel.level == level
+                        ) {
                             viewModel.saveLevel(level)
-                            // Разрешаем переход к следующему шагу
                             viewModel.canProceedFromCurrentStep = true
-                        }) {
-                            UserLevelOptionView(level: level, isSelected: viewModel.level == level)
                         }
-                        .padding(.horizontal)
+                        .padding(.horizontal, DesignTokens.Padding.screen)
                     }
+                }
+            }
+        }
+        .onAppear {
+            viewModel.canProceedFromCurrentStep = viewModel.level != nil
+        }
+    }
+}
+
+// MARK: - Activity Level Card
+struct ActivityLevelCard: View {
+    let level: Level
+    let isSelected: Bool
+    let action: () -> Void
+    
+    private var icon: String {
+        switch level {
+        case .lowActivity: return "figure.walk"
+        case .averageActivity: return "figure.run"
+        case .highActivity: return "figure.strengthtraining.traditional"
+        case .veryHighActivity: return "figure.mixed.cardio"
+        }
+    }
+    
+    private var intensityIndicator: (Color, String) {
+        switch level {
+        case .lowActivity: return (.gray, "Low")
+        case .averageActivity: return (.yellow, "Medium")
+        case .highActivity: return (.orange, "High")
+        case .veryHighActivity: return (.red, "Very High")
+        }
+    }
+    
+    var body: some View {
+        RiseOnCard(
+            style: isSelected ? .gradient : .basic,
+            size: .large,
+            onTap: action
+        ) {
+            HStack(spacing: DesignTokens.Spacing.lg) {
+                // Icon and intensity indicator
+                VStack(spacing: DesignTokens.Spacing.sm) {
+                    ZStack {
+                        Circle()
+                            .fill(intensityIndicator.0.opacity(0.2))
+                            .frame(width: 50, height: 50)
+                        
+                        Image(systemName: icon)
+                            .font(.system(size: DesignTokens.Sizes.iconMedium))
+                            .foregroundColor(isSelected ? .primaryButton : intensityIndicator.0)
+                    }
+                    
+                    Text(intensityIndicator.1)
+                        .riseOnCaption(.medium)
+                        .foregroundColor(intensityIndicator.0)
+                }
+                
+                // Content
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                    Text(level.rawValue)
+                        .riseOnHeading4()
+                        .foregroundColor(.typographyPrimary)
+                    
+                    Text(level.description)
+                        .riseOnBodySmall()
+                        .foregroundColor(.typographyGrey)
+                        .lineLimit(2)
                 }
                 
                 Spacer()
-            }
-            .padding()
-            .onAppear {
-                // При появлении экрана проверяем, выбран ли уже уровень активности
-                viewModel.canProceedFromCurrentStep = viewModel.level != nil
+                
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.primaryButton)
+                }
             }
         }
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
+                .stroke(isSelected ? Color.primaryButton : Color.clear, lineWidth: 2)
+        )
     }
 }
 
 #Preview {
     let viewModel = SurveyViewModel()
     return UserLevelScreen(viewModel: viewModel, currentStep: .constant(4))
+        .preferredColorScheme(.dark)
 }

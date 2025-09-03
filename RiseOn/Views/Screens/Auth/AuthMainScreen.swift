@@ -12,180 +12,202 @@ struct AuthMainScreen: View {
     @ObservedObject var authCoordinator: AuthCoordinator
     
     var body: some View {
-        VStack(spacing: 30) {
+        VStack(spacing: DesignTokens.Spacing.xl) {
             // Header
-            VStack(spacing: 6) {
-                Text("Join RiseOn")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                
-                Text("Save progress and sync across devices")
-                    .font(.footnote)
-                    .foregroundColor(.gray)
-                    .multilineTextAlignment(.center)
-            }
+            headerSection
             
             // Social login buttons
-            VStack(spacing: 15) {
-                // Apple Sign In
-                Button {
-                    handleAppleSignIn()
-                } label: {
-                    HStack(spacing: 12) {
-                        Image("apple")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 18, height: 18)
-                        
-                        Text("Continue with Apple")
-                            .font(.footnote)
-                            .fontWeight(.medium)
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, minHeight: 50)
-                    .background(Color.black)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                    )
-                    .cornerRadius(8)
-                }
-                
-                // Google Sign In
-                Button {
-                    handleGoogleSignIn()
-                } label: {
-                    HStack(spacing: 12) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 4)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                .background(Color.white)
-                                .frame(width: 18, height: 18)
-                            
-                            Image("google")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 14, height: 14)
-                                .colorInvert()
-                        }
-                        
-                        Text("Continue with Google")
-                            .font(.footnote)
-                            .fontWeight(.medium)
-                    }
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity, minHeight: 50)
-                    .background(Color.white)
-                    .cornerRadius(8)
-                }
-                
-                // Email buttons
-                HStack(spacing: 8) {
-                    Button {
-                        authCoordinator.navigate(to: .emailSignIn)
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "envelope.fill")
-                                .font(.system(size: 12))
-                            
-                            Text("Sign In")
-                                .font(.footnote)
-                                .fontWeight(.medium)
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(Color.card)
-                        .cornerRadius(8)
-                    }
-                    
-                    Button {
-                        authCoordinator.navigate(to: .emailSignUp)
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "person.badge.plus")
-                                .font(.system(size: 12))
-                            
-                            Text("Sign Up")
-                                .font(.footnote)
-                                .fontWeight(.medium)
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(Color.primaryButton.opacity(0.2))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.primaryButton.opacity(0.5), lineWidth: 1)
-                        )
-                        .cornerRadius(8)
-                    }
-                }
-            }
+            socialLoginSection
             
             // Guest mode
-            VStack(spacing: 8) {
-                Button {
-                    handleGuestMode()
-                } label: {
-                    HStack {
-                        Image(systemName: "person.crop.circle")
-                            .font(.system(size: 14))
-                            .foregroundColor(.primaryButton)
-                        
-                        Text("Continue as Guest")
-                            .font(.footnote)
-                            .fontWeight(.medium)
-                            .foregroundColor(.primaryButton)
-                        
-                        Spacer()
-                        
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 10))
-                            .foregroundColor(.gray)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color.card)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.primaryButton.opacity(0.3), lineWidth: 1)
-                            )
-                    )
+            guestModeSection
+            
+            // Terms
+            termsSection
+        }
+        .padding(.horizontal, DesignTokens.Padding.screen)
+        .padding(.top, DesignTokens.Spacing.lg)
+    }
+}
+
+// MARK: - Header Section
+extension AuthMainScreen {
+    private var headerSection: some View {
+        VStack(spacing: DesignTokens.Spacing.sm) {
+            Text("Join RiseOn")
+                .riseOnHeading2()
+                .foregroundColor(.typographyPrimary)
+            
+            Text("Save progress and sync across devices")
+                .riseOnCaption()
+                .foregroundColor(.typographyGrey)
+                .multilineTextAlignment(.center)
+        }
+    }
+}
+
+// MARK: - Social Login Section
+extension AuthMainScreen {
+    private var socialLoginSection: some View {
+        VStack(spacing: DesignTokens.Spacing.md) {
+            // Apple Sign In
+            SocialLoginButton(
+                title: "Continue with Apple",
+                icon: "apple",
+                style: .dark
+            ) {
+                handleAppleSignIn()
+            }
+            
+            // Google Sign In
+            SocialLoginButton(
+                title: "Continue with Google",
+                icon: "google",
+                style: .light
+            ) {
+                handleGoogleSignIn()
+            }
+            
+            // Email buttons
+            HStack(spacing: DesignTokens.Spacing.sm) {
+                RiseOnButton.secondary("Sign In", size: .medium) {
+                    authCoordinator.navigate(to: .emailSignIn)
                 }
                 
-                Button {
-                    appState.showAuthSheet = false
-                } label: {
-                    Text("Maybe Later")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .padding()
+                RiseOnButton(
+                    "Sign Up",
+                    style: .secondary,
+                    size: .medium
+                ) {
+                    authCoordinator.navigate(to: .emailSignUp)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Social Login Button Component
+struct SocialLoginButton: View {
+    let title: String
+    let icon: String
+    let style: Style
+    let action: () -> Void
+    
+    enum Style {
+        case dark, light
+        
+        var backgroundColor: Color {
+            switch self {
+            case .dark: return .black
+            case .light: return .white
+            }
+        }
+        
+        var foregroundColor: Color {
+            switch self {
+            case .dark: return .white
+            case .light: return .black
+            }
+        }
+        
+        var borderColor: Color {
+            switch self {
+            case .dark: return .white.opacity(0.3)
+            case .light: return .clear
+            }
+        }
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: DesignTokens.Spacing.md) {
+                Image(icon)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 18, height: 18)
+                
+                Text(title)
+                    .riseOnBodySmall(.medium)
+            }
+            .foregroundColor(style.foregroundColor)
+            .frame(maxWidth: .infinity)
+            .frame(height: DesignTokens.Size.button)
+            .background(style.backgroundColor)
+            .overlay(
+                RoundedRectangle(cornerRadius: DesignTokens.Radius.button)
+                    .stroke(style.borderColor, lineWidth: 1)
+            )
+            .cornerRadius(DesignTokens.Radius.button)
+        }
+    }
+}
+
+// MARK: - Guest Mode Section
+extension AuthMainScreen {
+    private var guestModeSection: some View {
+        VStack(spacing: DesignTokens.Spacing.sm) {
+            RiseOnCard(style: .outlined, size: .compact, onTap: handleGuestMode) {
+                HStack {
+                    Image(systemName: "person.crop.circle")
+                        .font(.system(size: DesignTokens.Sizes.iconSmall))
+                        .foregroundColor(.primaryButton)
+                    
+                    Text("Continue as Guest")
+                        .riseOnBodySmall(.medium)
+                        .foregroundColor(.primaryButton)
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 10))
+                        .foregroundColor(.typographyGrey)
                 }
             }
             
-            // Terms
-            Text("By continuing, you agree to our **Terms** and **Privacy Policy**")
-                .font(.caption2)
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
+            RiseOnButton.ghost("Maybe Later", size: .small) {
+                appState.showAuthSheet = false
+            }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 16)
     }
-    
-    // MARK: - Auth Methods
+}
+
+// MARK: - Terms Section
+extension AuthMainScreen {
+    private var termsSection: some View {
+        Text("By continuing, you agree to our **Terms** and **Privacy Policy**")
+            .riseOnCaption()
+            .foregroundColor(.typographyGrey)
+            .multilineTextAlignment(.center)
+    }
+}
+
+// MARK: - Auth Methods
+extension AuthMainScreen {
     func handleAppleSignIn() {
-        appState.login()
+        withAnimation(.easeInOut(duration: DesignTokens.Animation.fast)) {
+            appState.login()
+        }
     }
 
     func handleGoogleSignIn() {
-        appState.login()
+        withAnimation(.easeInOut(duration: DesignTokens.Animation.fast)) {
+            appState.login()
+        }
     }
 
     func handleGuestMode() {
-        appState.showAuthSheet = false
-        appState.login()
+        withAnimation(.easeInOut(duration: DesignTokens.Animation.fast)) {
+            appState.login()
+        }
     }
+}
+
+#Preview {
+    let appState = AppState()
+    let authCoordinator = AuthCoordinator()
+    
+    return AuthMainScreen(authCoordinator: authCoordinator)
+        .environmentObject(appState)
+        .preferredColorScheme(.dark)
+        .background(Color.black)
 }

@@ -1,10 +1,9 @@
 //
-//  AboutUserScreen 3.swift
+//  AboutUserScreen.swift
 //  RiseOn
 //
 //  Created by Владислав Дробитько on 13/03/2025.
 //
-
 
 import SwiftUI
 
@@ -19,36 +18,42 @@ struct AboutUserScreen: View {
     
     @State private var isNextButtonDisabled = true
     
+    // Validation states
+    @State private var nameError: String? = nil
+    @State private var ageError: String? = nil
+    @State private var heightError: String? = nil
+    @State private var weightError: String? = nil
+    @State private var targetWeightError: String? = nil
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             Color.black.ignoresSafeArea()
             
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.sectionSpacing) {
+                    // User Info Section
                     userInfoSection
-                    genderSelection
-                    userAgeInput
-                    weightAndHeightInput
-                    Spacer(minLength: 100) // Увеличиваем минимальный spacer чтобы контент не прижимался к нижней кнопке
+                    
+                    // Gender Selection
+                    genderSelectionSection
+                    
+                    // Age Input
+                    ageInputSection
+                    
+                    // Weight and Height
+                    measurementSection
+                    
+                    Spacer(minLength: 120) // Space for bottom button
                 }
-                .padding()
-                .background(Color.black) // Дублируем фон для уверенности
+                .padding(DesignTokens.Padding.screen)
             }
             .modifier(KeyboardAdaptive())
-            .background(Color.black) // Дублируем фон чтобы убедиться, что ScrollView виден
+            .background(Color.black)
             .onAppear {
-                print("AboutUserScreen appeared")
                 loadUserData()
-                
-                // Принудительное обновление состояния кнопки после небольшой задержки
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    checkButtonState()
-                    print("Button state on appear: \(isNextButtonDisabled)")
-                    print("Can proceed: \(!isNextButtonDisabled)")
-                }
+                checkButtonState()
             }
             .onDisappear {
-                print("AboutUserScreen disappeared")
                 saveUserData()
             }
         }
@@ -58,155 +63,216 @@ struct AboutUserScreen: View {
 
 // MARK: - UI Sections
 extension AboutUserScreen {
+    
     private var userInfoSection: some View {
-        VStack(alignment: .leading) {
-            titleText("What is your name?")
-            AboutUserTextField(title: "", text: $viewModel.name, placeholder: "Enter your name")
-                .onChange(of: viewModel.name) { _, newValue in
-                    print("Name changed to: \(newValue)")
-                    checkButtonState()
-                }
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+            Text("What is your name?")
+                .riseOnHeading3()
+                .foregroundColor(.typographyPrimary)
+            
+            RiseOnTextField(
+                text: $viewModel.name,
+                placeholder: "Enter your name",
+                errorMessage: nameError,
+                leadingIcon: "person"
+            )
+            .onChange(of: viewModel.name) { _, _ in
+                validateName()
+                checkButtonState()
+            }
         }
     }
     
-    private var genderSelection: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            titleText("Your gender?")
-            HStack {
+    private var genderSelectionSection: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+            Text("Your gender")
+                .riseOnHeading3()
+                .foregroundColor(.typographyPrimary)
+            
+            HStack(spacing: DesignTokens.Spacing.lg) {
                 ForEach(Gender.allCases, id: \.self) { gender in
-                    TabButton(
-                        title: gender.description,
-                        iconName: gender == .male ? "iconBoy" : "iconGirl",
-                        isSelected: .init(
-                            get: { viewModel.gender == gender },
-                            set: {
-                                if $0 {
-                                    print("Gender selected: \(gender)")
-                                    viewModel.saveGender(gender)
-                                    checkButtonState()
-                                }
-                            }
-                        ),
-                        cornerRadius: 20
-                    )
+                    GenderSelectionCard(
+                        gender: gender,
+                        isSelected: viewModel.gender == gender
+                    ) {
+                        viewModel.saveGender(gender)
+                        checkButtonState()
+                    }
                 }
             }
-            .padding(.horizontal)
         }
     }
     
-    private var userAgeInput: some View {
-        VStack(alignment: .leading) {
-            titleText("How old are you?")
-            numberTextField(text: $ageText, placeholder: "Enter your age", unit: nil)
-                .onChange(of: ageText) { _, newValue in
-                    print("Age changed: \(newValue)")
-                }
+    private var ageInputSection: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+            Text("How old are you?")
+                .riseOnHeading3()
+                .foregroundColor(.typographyPrimary)
+            
+            RiseOnTextField(
+                text: $ageText,
+                placeholder: "Enter your age",
+                keyboardType: .numberPad,
+                errorMessage: ageError,
+                helperText: "years",
+                leadingIcon: "calendar"
+            )
+            .onChange(of: ageText) { _, _ in
+                validateAge()
+                checkButtonState()
+            }
         }
     }
     
-    private var weightAndHeightInput: some View {
-        VStack(alignment: .leading, spacing: 15) {
-            titleText("Your weight and height")
-            SegmentedControl(selectedUnit: $viewModel.selectedUnit)
-                .padding(.horizontal)
-                .onChange(of: viewModel.selectedUnit) { _, _ in
-                    print("Unit changed to: \(viewModel.selectedUnit)")
-                }
+    private var measurementSection: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+            HStack {
+                Text("Your measurements")
+                    .riseOnHeading3()
+                    .foregroundColor(.typographyPrimary)
+                
+                Spacer()
+                
+                // Unit Toggle (using existing SegmentedControl)
+                SegmentedControl(selectedUnit: $viewModel.selectedUnit)
+                    .onChange(of: viewModel.selectedUnit) { _, _ in
+                        checkButtonState()
+                    }
+            }
             
-            numberTextField(text: $heightText, placeholder: "Your height", unit: viewModel.selectedUnit == .metric ? "cm" : "ft")
-                .onChange(of: heightText) { _, newValue in
-                    print("Height changed: \(newValue)")
+            VStack(spacing: DesignTokens.Spacing.lg) {
+                MeasurementTextField(
+                    title: "Height",
+                    text: $heightText,
+                    unit: viewModel.selectedUnit == .metric ? "cm" : "ft",
+                    placeholder: "Your height",
+                    errorMessage: heightError
+                )
+                .onChange(of: heightText) { _, _ in
+                    validateHeight()
+                    checkButtonState()
                 }
-            
-            numberTextField(text: $weightText, placeholder: "Your weight", unit: viewModel.selectedUnit == .metric ? "kg" : "lbs")
-                .onChange(of: weightText) { _, newValue in
-                    print("Weight changed: \(newValue)")
+                
+                MeasurementTextField(
+                    title: "Current Weight",
+                    text: $weightText,
+                    unit: viewModel.selectedUnit == .metric ? "kg" : "lbs",
+                    placeholder: "Your weight",
+                    errorMessage: weightError
+                )
+                .onChange(of: weightText) { _, _ in
+                    validateWeight()
+                    checkButtonState()
                 }
-            
-            numberTextField(text: $targetWeightText, placeholder: "Your target weight", unit: viewModel.selectedUnit == .metric ? "kg" : "lbs")
-                .onChange(of: targetWeightText) { _, newValue in
-                    print("Target weight changed: \(newValue)")
+                
+                MeasurementTextField(
+                    title: "Target Weight",
+                    text: $targetWeightText,
+                    unit: viewModel.selectedUnit == .metric ? "kg" : "lbs",
+                    placeholder: "Your target weight",
+                    errorMessage: targetWeightError
+                )
+                .onChange(of: targetWeightText) { _, _ in
+                    validateTargetWeight()
+                    checkButtonState()
                 }
+            }
         }
     }
 }
 
-// MARK: - Helpers
+// MARK: - Gender Selection Card
+struct GenderSelectionCard: View {
+    let gender: Gender
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        RiseOnCard(
+            style: isSelected ? .gradient : .basic,
+            size: .medium,
+            onTap: action
+        ) {
+            VStack(spacing: DesignTokens.Spacing.sm) {
+                Image(gender == .male ? "iconBoy" : "iconGirl")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: DesignTokens.Sizes.iconLarge)
+                    .foregroundColor(isSelected ? .primaryButton : .typographyGrey)
+                
+                Text(gender.description)
+                    .riseOnBodySmall(.medium)
+                    .foregroundColor(isSelected ? .typographyPrimary : .typographyGrey)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 80)
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
+                .stroke(isSelected ? Color.primaryButton : Color.clear, lineWidth: 2)
+        )
+    }
+}
+
+// MARK: - Validation Methods
 extension AboutUserScreen {
-    private func titleText(_ text: String) -> some View {
-        Text(text)
-            .font(.title3)
-            .fontWeight(.light)
-            .foregroundStyle(.typographyPrimary)
-            .padding(.horizontal)
+    
+    private func validateName() {
+        nameError = FormValidation.validateName(viewModel.name) ? nil : "Name is required"
     }
     
-    private func numberTextField(text: Binding<String>, placeholder: String, unit: String?) -> some View {
-        AboutUserTextField(title: "", text: text, placeholder: placeholder, keyboardType: .decimalPad)
-            .overlay(
-                HStack {
-                    Spacer()
-                    if let unit = unit {
-                        Text(unit)
-                            .foregroundColor(.gray)
-                            .padding(.trailing, 40)
-                    }
-                }
-            )
-            .onChange(of: text.wrappedValue) { _, newValue in
-                let correctedValue = newValue.replacingOccurrences(of: ",", with: ".")
-                if correctedValue != newValue {
-                    text.wrappedValue = correctedValue
-                }
-                checkButtonState()
-            }
+    private func validateAge() {
+        ageError = FormValidation.validateAge(ageText) ? nil : "Age must be between 10-130"
+    }
+    
+    private func validateHeight() {
+        heightError = FormValidation.validateHeight(heightText) ? nil : "Height must be between 30-250 cm"
+    }
+    
+    private func validateWeight() {
+        weightError = FormValidation.validateWeight(weightText) ? nil : "Weight must be between 20-400 kg"
+    }
+    
+    private func validateTargetWeight() {
+        targetWeightError = FormValidation.validateTargetWeight(targetWeightText) ? nil : "Target weight must be between 30-400 kg"
     }
     
     private func checkButtonState() {
-        let name = viewModel.name
+        let name = viewModel.name.trimmingCharacters(in: .whitespaces)
         let age = ageText.trimmingCharacters(in: .whitespaces)
         let height = heightText.trimmingCharacters(in: .whitespaces)
         let weight = weightText.trimmingCharacters(in: .whitespaces)
         let targetWeight = targetWeightText.trimmingCharacters(in: .whitespaces)
         
-        print("Checking fields - Name: '\(name)', Age: '\(age)', Height: '\(height)', Weight: '\(weight)', Target: '\(targetWeight)'")
+        let hasAllFields = !name.isEmpty && !age.isEmpty && !height.isEmpty && !weight.isEmpty && !targetWeight.isEmpty && viewModel.gender != nil
         
-        let newState = name.isEmpty ||
-                      age.isEmpty ||
-                      height.isEmpty ||
-                      weight.isEmpty ||
-                      targetWeight.isEmpty ||
-                      viewModel.gender == nil
+        let hasNoErrors = nameError == nil &&
+                         ageError == nil &&
+                         heightError == nil &&
+                         weightError == nil &&
+                         targetWeightError == nil
+        
+        let newState = !(hasAllFields && hasNoErrors)
         
         if isNextButtonDisabled != newState {
             isNextButtonDisabled = newState
-            print("Button state updated to: \(isNextButtonDisabled)")
         }
         
-        // Всегда обновляем значение в viewModel
         viewModel.canProceedFromCurrentStep = !isNextButtonDisabled
-        print("Can proceed updated to: \(!isNextButtonDisabled)")
     }
     
     private func loadUserData() {
-        print("Loading user data")
         ageText = viewModel.age.map { String($0) } ?? ""
         heightText = viewModel.height.map { String($0) } ?? ""
         weightText = viewModel.weight.map { String($0) } ?? ""
         targetWeightText = viewModel.targetWeight.map { String($0) } ?? ""
         
-        print("Loaded data - Age: '\(ageText)', Height: '\(heightText)', Weight: '\(weightText)', Target: '\(targetWeightText)'")
-        print("Current gender: \(String(describing: viewModel.gender))")
-        
-        // При загрузке данных проверяем состояние кнопки
         DispatchQueue.main.async {
             self.checkButtonState()
         }
     }
     
     private func saveUserData() {
-        print("Saving user data")
         if let age = Int(ageText) {
             viewModel.age = age
         }
@@ -222,19 +288,13 @@ extension AboutUserScreen {
         if let targetWeight = Double(targetWeightText) {
             viewModel.targetWeight = targetWeight
         }
-        
-        print("Saved data - Age: \(String(describing: viewModel.age)), Height: \(String(describing: viewModel.height)), Weight: \(String(describing: viewModel.weight)), Target: \(String(describing: viewModel.targetWeight))")
     }
 }
 
 #Preview {
-    // Создаём viewModel
     let viewModel = SurveyViewModel()
     
-    // Создаём привязку для currentStep
-    AboutUserScreen(viewModel: viewModel, currentStep: .constant(2))
+    return AboutUserScreen(viewModel: viewModel, currentStep: .constant(2))
         .background(Color.black)
         .preferredColorScheme(.dark)
 }
-
-

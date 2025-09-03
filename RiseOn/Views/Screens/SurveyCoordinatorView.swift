@@ -12,95 +12,269 @@ struct SurveyCoordinatorView: View {
     @State private var currentStep: Int = 1
     @Environment(\.dismiss) private var dismiss
     
+    private let totalSteps = 8
+    
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
                 
-                // Отображаем нужный экран в зависимости от текущего шага опроса
-                Group {
-                    switch currentStep {
-                    case 1:
-                        WelcomeToSurvey(viewModel: viewModel)
-                            .transition(.opacity)
-                    case 2:
-                        AboutUserScreen(viewModel: viewModel, currentStep: .constant(2))
-                            .transition(.opacity)
-                    case 3:
-                        UserGoalScreen(viewModel: viewModel, currentStep: .constant(3))
-                            .transition(.opacity)
-                    case 4:
-                        UserLevelScreen(viewModel: viewModel, currentStep: .constant(4))
-                            .transition(.opacity)
-                    case 5:
-                        UserPreferScreen(viewModel: viewModel, currentStep: .constant(5))
-                            .transition(.opacity)
-                    case 6:
-                        UserDietesScreen(viewModel: viewModel, currentStep: .constant(6))
-                            .transition(.opacity)
-                    case 7:
-                        WorkoutDaysScreen(viewModel: viewModel, currentStep: .constant(7))
-                            .transition(.opacity)
-                    case 8:
-                        SurveyResult(viewModel: viewModel, currentStep: .constant(8))
-                            .transition(.opacity)
-                    default:
-                        EmptyView()
-                    }
-                }
-                
-                VStack {
-                    // Тулбар для шагов 2-8
+                VStack(spacing: 0) {
+                    // Toolbar для шагов 2-8
                     if currentStep > 1 {
-                        CustomToolbar(currentStep: currentStep - 1, totalSteps: 7) {
-                            if currentStep > 1 {
-                                withAnimation {
-                                    currentStep -= 1
-                                }
-                            }
+                        surveyToolbar
+                            .zIndex(1)
+                    }
+                    
+                    // Контент экрана
+                    Spacer()
+                    
+                    Group {
+                        switch currentStep {
+                        case 1:
+                            WelcomeToSurvey(viewModel: viewModel)
+                                .transition(.opacity)
+                        case 2:
+                            AboutUserScreen(viewModel: viewModel, currentStep: .constant(2))
+                                .transition(.opacity)
+                        case 3:
+                            UserGoalScreen(viewModel: viewModel, currentStep: .constant(3))
+                                .transition(.opacity)
+                        case 4:
+                            UserLevelScreen(viewModel: viewModel, currentStep: .constant(4))
+                                .transition(.opacity)
+                        case 5:
+                            UserPreferScreen(viewModel: viewModel, currentStep: .constant(5))
+                                .transition(.opacity)
+                        case 6:
+                            UserDietesScreen(viewModel: viewModel, currentStep: .constant(6))
+                                .transition(.opacity)
+                        case 7:
+                            WorkoutDaysScreen(viewModel: viewModel, currentStep: .constant(7))
+                                .transition(.opacity)
+                        case 8:
+                            SurveyResult(viewModel: viewModel, currentStep: .constant(8))
+                                .transition(.opacity)
+                        default:
+                            EmptyView()
                         }
-                        .zIndex(1) // Чтобы тулбар был над контентом
                     }
                     
                     Spacer()
                     
-                    // Кнопка "Продолжить"/"Завершить"
+                    // Кнопка продолжить
                     if currentStep > 1 {
-                        CustomButton(
-                            title: currentStep == 8 ? "Завершить" : "Продолжить",
-                            state: currentStep == 1 || viewModel.canProceedFromCurrentStep ? .normal : .disabled
-                        ) {
-                            if currentStep < 8 {
-                                // На первом экране кнопка всегда активна
-                                if currentStep == 1 {
-                                    viewModel.canProceedFromCurrentStep = false
-                                }
-                                
-                                // Переходим к следующему шагу
-                                withAnimation {
-                                    currentStep += 1
-                                }
-                            } else {
-                                // Завершаем опрос
-                                self.viewModel.saveResults()
-                                // TODO: Сохранить результаты в профиль
-                                dismiss()
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.bottom, 30)
+                        bottomButton
+                            .padding(.horizontal, DesignTokens.Padding.screen)
+                            .padding(.bottom, DesignTokens.Spacing.xl)
                     }
                 }
-                .padding(.horizontal)
             }
         }
         .navigationBarHidden(true)
         .onAppear {
-            // При появлении экрана активируем кнопку для первого шага
             if currentStep == 1 {
                 viewModel.canProceedFromCurrentStep = true
             }
         }
+    }
+}
+
+// MARK: - Survey Toolbar
+extension SurveyCoordinatorView {
+    private var surveyToolbar: some View {
+        VStack(spacing: 0) {
+            HStack {
+                // Кнопка назад
+                RiseOnButton.ghost("", size: .small) {
+                    if currentStep > 1 {
+                        withAnimation(.easeInOut(duration: DesignTokens.Animation.normal)) {
+                            currentStep -= 1
+                        }
+                    }
+                }
+                .overlay(
+                    Image("chevronLeft")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.typographyPrimary)
+                )
+                .frame(width: 44, height: 44)
+                
+                Spacer()
+                
+                // Индикатор прогресса
+                SurveyProgressIndicator(
+                    currentStep: currentStep - 1,
+                    totalSteps: totalSteps - 1
+                )
+                
+                Spacer()
+                
+                // Пустое место для баланса
+                Color.clear
+                    .frame(width: 44, height: 44)
+            }
+            .padding(.horizontal, DesignTokens.Padding.screen)
+            .frame(height: 60)
+            .background(Color.black)
+            
+            // Разделитель
+            Rectangle()
+                .fill(Color.typographyGrey.opacity(0.2))
+                .frame(height: 1)
+        }
+    }
+}
+
+// MARK: - Survey Progress Indicator
+struct SurveyProgressIndicator: View {
+    let currentStep: Int
+    let totalSteps: Int
+    
+    var body: some View {
+        VStack(spacing: DesignTokens.Spacing.xs) {
+            // Progress bar
+            HStack(spacing: DesignTokens.Spacing.xs) {
+                ForEach(0..<totalSteps, id: \.self) { index in
+                    Rectangle()
+                        .fill(index < currentStep ? Color.primaryButton : Color.typographyGrey.opacity(0.3))
+                        .frame(height: 3)
+                        .frame(maxWidth: .infinity)
+                        .cornerRadius(1.5)
+                }
+            }
+            .frame(maxWidth: 120)
+            
+            // Step counter
+            Text("\(currentStep) of \(totalSteps)")
+                .riseOnCaption()
+                .foregroundColor(.typographyGrey)
+        }
+    }
+}
+
+// MARK: - Bottom Button
+extension SurveyCoordinatorView {
+    private var bottomButton: some View {
+        VStack(spacing: DesignTokens.Spacing.sm) {
+            RiseOnButton(
+                currentStep == totalSteps ? "Complete Survey" : "Continue",
+                style: viewModel.canProceedFromCurrentStep ? .primary : .disabled,
+                size: .large
+            ) {
+                handleContinueAction()
+            }
+            
+            // Skip button для опциональных шагов
+            if canSkipCurrentStep {
+                RiseOnButton.ghost("Skip for now", size: .small) {
+                    proceedToNextStep()
+                }
+            }
+        }
+    }
+    
+    private var canSkipCurrentStep: Bool {
+        // Можно пропустить некоторые шаги (например, предпочтения тренировок)
+        return currentStep == 5 || currentStep == 7
+    }
+    
+    private func handleContinueAction() {
+        if currentStep < totalSteps {
+            if currentStep == 1 {
+                viewModel.canProceedFromCurrentStep = false
+            }
+            proceedToNextStep()
+        } else {
+            // Завершение опроса
+            viewModel.saveResults()
+            dismiss()
+        }
+    }
+    
+    private func proceedToNextStep() {
+        withAnimation(.easeInOut(duration: DesignTokens.Animation.normal)) {
+            currentStep += 1
+        }
+    }
+}
+
+// MARK: - Survey Step Card (для использования в других экранах)
+struct SurveyStepCard: View {
+    let title: String
+    let subtitle: String?
+    let content: AnyView
+    
+    init<Content: View>(
+        title: String,
+        subtitle: String? = nil,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.content = AnyView(content())
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.sectionSpacing) {
+            // Header
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+                Text(title)
+                    .riseOnHeading2()
+                    .foregroundColor(.typographyPrimary)
+                
+                if let subtitle = subtitle {
+                    Text(subtitle)
+                        .riseOnBody()
+                        .foregroundColor(.typographyGrey)
+                }
+            }
+            .padding(.horizontal, DesignTokens.Padding.screen)
+            
+            // Content
+            content
+        }
+    }
+}
+
+// MARK: - Survey Option Card (для выбора опций)
+struct SurveyOptionCard: View {
+    let title: String
+    let subtitle: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        RiseOnCard(
+            style: isSelected ? .gradient : .basic,
+            size: .medium,
+            onTap: action
+        ) {
+            HStack {
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                    Text(title)
+                        .riseOnHeading4()
+                        .foregroundColor(.typographyPrimary)
+                    
+                    Text(subtitle)
+                        .riseOnBodySmall()
+                        .foregroundColor(.typographyGrey)
+                        .lineLimit(2)
+                }
+                
+                Spacer()
+                
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(.primaryButton)
+                }
+            }
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
+                .stroke(isSelected ? Color.primaryButton : Color.clear, lineWidth: 2)
+        )
     }
 }
 

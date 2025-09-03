@@ -11,30 +11,33 @@ import SwiftData
 struct MainApp: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var appState = AppState()
+    @State private var showSplash = true
     
     var body: some View {
         Group {
-            if appState.isFirstLaunch {
+            if showSplash {
+                SplashScreen()
+                    .onAppear {
+                        // Показываем splash 2 секунды
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                            withAnimation(.easeOut(duration: 0.5)) {
+                                showSplash = false
+                            }
+                        }
+                    }
+            } else if appState.isFirstLaunch {
                 StartScreenView()
             } else if appState.isAuthenticated {
                 MainTabView()
             } else {
-                Color.black.ignoresSafeArea()
+                StartScreenView()
             }
         }
         .preferredColorScheme(.dark)
         .tint(.primaryButton)
         .environmentObject(appState)
-        .sheet(isPresented: $appState.showAuthSheet) {
-            AuthView()
-                .environmentObject(appState)
-        }
         .onAppear {
             appState.updateModelContext(modelContext)
-            // Если не первый запуск и не авторизован - показываем Sheet
-            if !appState.isFirstLaunch && !appState.isAuthenticated {
-                appState.showAuthSheet = true
-            }
         }
     }
 }
@@ -92,18 +95,26 @@ struct MainTabView: View {
 }
 
 struct SplashScreen: View {
-    @State private var opacity = 1.0
+    @State private var logoScale = 0.8
+    @State private var logoOpacity = 0.0
     
     var body: some View {
         ZStack {
             Color.black
                 .ignoresSafeArea()
             
-            Image("Logo")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 125, height: 125)
-                .opacity(opacity)
+            VStack(spacing: 20) {
+                Image("logoRiseOn") // Используем тот же логотип что и на стартовом экране
+                    .scaleEffect(logoScale)
+                    .opacity(logoOpacity)
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 0.8)) {
+                            logoScale = 1.0
+                            logoOpacity = 1.0
+                        }
+                    }
+                
+            }
         }
     }
 }
