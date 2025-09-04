@@ -14,25 +14,29 @@ enum RiseOnCardStyle {
     case outlined       // Карточка с обводкой
     case gradient       // Карточка с градиентом
     case glass          // Стеклянный эффект
+    case selectable     // Карточка с поддержкой выбора
     
-    var backgroundColor: Color {
+    func backgroundColor(isSelected: Bool = false) -> Color {
         switch self {
         case .basic, .elevated, .outlined: return .card
         case .gradient: return .clear
         case .glass: return .clear
+        case .selectable: return .clear // Background will be handled by gradient
         }
     }
     
-    var borderColor: Color {
+    func borderColor(isSelected: Bool = false) -> Color {
         switch self {
         case .outlined: return .typographyGrey.opacity(0.3)
+        case .selectable: return isSelected ? .primaryButton : .clear
         default: return .clear
         }
     }
     
-    var borderWidth: CGFloat {
+    func borderWidth(isSelected: Bool = false) -> CGFloat {
         switch self {
         case .outlined: return 1
+        case .selectable: return isSelected ? 1 : 0
         default: return 0
         }
     }
@@ -83,15 +87,18 @@ struct RiseOnCard<Content: View>: View {
     let size: RiseOnCardSize
     let content: Content
     let onTap: (() -> Void)?
+    let isSelected: Bool
     
     init(
         style: RiseOnCardStyle = .basic,
         size: RiseOnCardSize = .medium,
+        isSelected: Bool = false,
         onTap: (() -> Void)? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.style = style
         self.size = size
+        self.isSelected = isSelected
         self.onTap = onTap
         self.content = content()
     }
@@ -116,7 +123,7 @@ struct RiseOnCard<Content: View>: View {
             .background(cardBackground)
             .overlay(
                 RoundedRectangle(cornerRadius: size.cornerRadius)
-                    .stroke(style.borderColor, lineWidth: style.borderWidth)
+                    .stroke(style.borderColor(isSelected: isSelected), lineWidth: style.borderWidth(isSelected: isSelected))
             )
             .cornerRadius(size.cornerRadius)
             .shadow(
@@ -125,18 +132,22 @@ struct RiseOnCard<Content: View>: View {
                 x: style.shadowOffset.width,
                 y: style.shadowOffset.height
             )
+            .scaleEffect(isSelected && style == .selectable ? 1.02 : 1.0)
+            .animation(.easeInOut(duration: DesignTokens.Animation.fast), value: isSelected)
     }
     
     @ViewBuilder
     private var cardBackground: some View {
         switch style {
         case .basic, .elevated, .outlined:
-            style.backgroundColor
+            style.backgroundColor(isSelected: isSelected)
         case .gradient:
             LinearGradient.gradientCard
         case .glass:
             Color.clear
                 .background(.ultraThinMaterial)
+        case .selectable:
+            isSelected ? LinearGradient.gradientDarkGreen : LinearGradient.gradientCard
         }
     }
 }

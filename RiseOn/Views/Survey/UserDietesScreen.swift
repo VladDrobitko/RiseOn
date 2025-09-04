@@ -68,8 +68,9 @@ struct DietOptionCard: View {
     
     var body: some View {
         RiseOnCard(
-            style: .basic,
+            style: .selectable,
             size: .medium,
+            isSelected: isSelected,
             onTap: action
         ) {
             HStack(spacing: DesignTokens.Spacing.md) {
@@ -89,7 +90,7 @@ struct DietOptionCard: View {
                     HStack {
                         Text(diet.rawValue)
                             .riseOnBodySmall(.medium)
-                            .foregroundColor(.typographyPrimary)
+                            .foregroundColor(isSelected ? .white : .typographyPrimary)
                         
                         if let tag = tag {
                             Text(tag)
@@ -106,7 +107,7 @@ struct DietOptionCard: View {
                     
                     Text(diet.description)
                         .riseOnCaption()
-                        .foregroundColor(.typographyGrey)
+                        .foregroundColor(isSelected ? .white.opacity(0.8) : .typographyGrey)
                         .lineLimit(2)
                 }
                 
@@ -118,12 +119,6 @@ struct DietOptionCard: View {
             }
             .frame(height: 60)
         }
-        .background(isSelected ? .primaryButton : .clear)
-        .cornerRadius(DesignTokens.CornerRadius.md)
-        .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md)
-                .stroke(isSelected ? .primaryButton : Color.clear, lineWidth: 1)
-        )
     }
 }
 

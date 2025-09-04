@@ -159,27 +159,13 @@ struct SurveyProgressIndicator: View {
 // MARK: - Bottom Button
 extension SurveyCoordinatorView {
     private var bottomButton: some View {
-        VStack(spacing: DesignTokens.Spacing.sm) {
-            RiseOnButton(
-                currentStep == totalSteps ? "Complete Survey" : "Continue",
-                style: viewModel.canProceedFromCurrentStep ? .primary : .disabled,
-                size: .large
-            ) {
-                handleContinueAction()
-            }
-            
-            // Skip button для опциональных шагов
-            if canSkipCurrentStep {
-                RiseOnButton.ghost("Skip for now", size: .small) {
-                    proceedToNextStep()
-                }
-            }
+        RiseOnButton(
+            currentStep == totalSteps ? "Complete Survey" : "Continue",
+            style: viewModel.canProceedFromCurrentStep ? .primary : .disabled,
+            size: .large
+        ) {
+            handleContinueAction()
         }
-    }
-    
-    private var canSkipCurrentStep: Bool {
-        // Можно пропустить некоторые шаги (например, предпочтения тренировок)
-        return currentStep == 5 || currentStep == 7
     }
     
     private func handleContinueAction() {

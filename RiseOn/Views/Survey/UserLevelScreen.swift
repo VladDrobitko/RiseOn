@@ -65,8 +65,9 @@ struct ActivityLevelCard: View {
     
     var body: some View {
         RiseOnCard(
-            style: .basic,
+            style: .selectable,
             size: .medium,
+            isSelected: isSelected,
             onTap: action
         ) {
             HStack(spacing: DesignTokens.Spacing.md) {
@@ -92,11 +93,11 @@ struct ActivityLevelCard: View {
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                     Text(level.rawValue)
                         .riseOnBodySmall(.medium)
-                        .foregroundColor(.typographyPrimary)
+                        .foregroundColor(isSelected ? .white : .typographyPrimary)
                     
                     Text(level.description)
                         .riseOnCaption()
-                        .foregroundColor(.typographyGrey)
+                        .foregroundColor(isSelected ? .white.opacity(0.8) : .typographyGrey)
                         .lineLimit(2)
                 }
                 
@@ -110,12 +111,6 @@ struct ActivityLevelCard: View {
             }
             .frame(height: 60)
         }
-        .background(isSelected ? .primaryButton : .clear)
-        .cornerRadius(DesignTokens.CornerRadius.md)
-        .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md)
-                .stroke(isSelected ? .primaryButton : Color.clear, lineWidth: 1)
-        )
     }
 }
 

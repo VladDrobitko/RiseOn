@@ -11,95 +11,139 @@ struct MainPage: View {
     @EnvironmentObject var appState: AppState
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: DesignTokens.Spacing.sectionSpacing) {
-                // Приветствие пользователя
-                welcomeSection
-                
-                // Основной контент
-                VStack(spacing: DesignTokens.Spacing.sectionSpacing) {
-                    // Информационная карточка
-                    welcomeInfoCard
-                    
-                    // Быстрые действия
-                    quickActionsSection
-                    
-                    // Статистика
-                    statisticsSection
+        GeometryReader { geometry in
+            let availableHeight = geometry.size.height - 52 - 83 // toolbar + tabbar
+            let sectionHeight = availableHeight / 3
+            
+            VStack(spacing: 0) {
+                // Верхняя секция - карточка событий
+                VStack {
+                    Spacer()
+                    topEventCard
+                        .padding(.horizontal, DesignTokens.Padding.screen)
+                    Spacer()
                 }
-                .padding(.horizontal, DesignTokens.Padding.screen)
+                .frame(height: sectionHeight)
+                
+                // Средняя секция - горизонтальный скролл групп мышц
+                VStack {
+                    Spacer()
+                    muscleGroupsHorizontalSection
+                    Spacer()
+                }
+                .frame(height: sectionHeight)
+                
+                // Нижняя секция - квадратные карточки разминки
+                VStack {
+                    Spacer()
+                    warmUpCardsSection
+                        .padding(.horizontal, DesignTokens.Padding.screen)
+                    Spacer()
+                }
+                .frame(height: sectionHeight)
             }
-            .padding(.top, DesignTokens.Spacing.xl)
         }
         .background(Color.black.ignoresSafeArea(.all))
     }
 }
 
-// MARK: - Welcome Section
+// MARK: - Top Event Card
 extension MainPage {
-    private var welcomeSection: some View {
-        VStack(spacing: DesignTokens.Spacing.md) {
-            Text("Welcome back!")
-                .riseOnHeading1()
-                .foregroundColor(.typographyPrimary)
-            
-            Text("Ready to continue your fitness journey?")
-                .riseOnBody()
-                .foregroundColor(.typographyGrey)
-                .multilineTextAlignment(.center)
-        }
-        .padding(.horizontal, DesignTokens.Padding.screen)
-    }
-}
-
-// MARK: - Welcome Info Card
-extension MainPage {
-    private var welcomeInfoCard: some View {
-        InfoCard(
-            title: "Start Your Journey",
-            message: "Complete your profile setup to get personalized workout and nutrition plans tailored just for you.",
-            icon: "figure.run.circle.fill",
-            style: .glass
-        )
-    }
-}
-
-// MARK: - Quick Actions Section
-extension MainPage {
-    private var quickActionsSection: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
-            Text("Quick Actions")
-                .riseOnHeading2()
-                .foregroundColor(.typographyPrimary)
-            
-            LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible(), spacing: DesignTokens.Spacing.md), count: 3),
-                spacing: DesignTokens.Spacing.md
-            ) {
-                QuickActionCard(
-                    title: "Workout",
-                    icon: "figure.run",
-                    color: .primaryButton
-                ) {
-                    print("Workout tapped")
+    private var topEventCard: some View {
+        RiseOnCard(style: .gradient, size: .large) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+                HStack {
+                    VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+                        Text("🏃‍♂️ Marathon Training")
+                            .riseOnHeading2()
+                            .foregroundColor(.typographyPrimary)
+                        
+                        Text("Join our 12-week marathon preparation program")
+                            .riseOnBody()
+                            .foregroundColor(.typographyGrey)
+                            .lineLimit(2)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(.typographyGrey)
                 }
                 
-                QuickActionCard(
-                    title: "Nutrition",
-                    icon: "fork.knife",
-                    color: .hoverButton
-                ) {
-                    print("Nutrition tapped")
-                }
+                Spacer()
                 
-                QuickActionCard(
-                    title: "Progress",
-                    icon: "chart.line.uptrend.xyaxis",
-                    color: .focusedButton
-                ) {
-                    print("Progress tapped")
+                HStack(spacing: DesignTokens.Spacing.lg) {
+                    StatChip(icon: "calendar", text: "12 weeks", color: .primaryButton)
+                    StatChip(icon: "person.2", text: "1.2k joined", color: .primaryButton)
+                    Spacer()
                 }
             }
+        }
+        .frame(height: 180)
+    }
+}
+
+// MARK: - Muscle Groups Horizontal Section
+extension MainPage {
+    private var muscleGroupsHorizontalSection: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
+            // Header with "Show All" button
+            HStack {
+                Text("Muscle Groups")
+                    .riseOnHeading2()
+                    .foregroundColor(.typographyPrimary)
+                
+                Spacer()
+                
+                NavigationLink(destination: TestMuscleGroupScreen()) {
+                    HStack(spacing: 4) {
+                        Text("Show All")
+                            .riseOnCaption(.medium)
+                            .foregroundColor(.primaryButton)
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(.primaryButton)
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.horizontal, DesignTokens.Padding.screen)
+            
+            // Vertical layout for muscle group cards
+            VStack(spacing: DesignTokens.Spacing.md) {
+                // Первая карточка - ведет на список упражнений
+                NavigationLink(destination: ExerciseListScreen(muscleGroup: .legs)) {
+                    CompactMuscleGroupCard(
+                        muscleGroup: .legs,
+                        exerciseCount: 2,
+                        estimatedTime: 27
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                // Вторая карточка
+                NavigationLink(destination: ExerciseListScreen(muscleGroup: .chest)) {
+                    CompactMuscleGroupCard(
+                        muscleGroup: .chest,
+                        exerciseCount: 2,
+                        estimatedTime: 30
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                // Третья карточка
+                NavigationLink(destination: ExerciseListScreen(muscleGroup: .back)) {
+                    CompactMuscleGroupCard(
+                        muscleGroup: .back,
+                        exerciseCount: 2,
+                        estimatedTime: 25
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.horizontal, DesignTokens.Padding.screen)
         }
     }
 }
@@ -135,55 +179,122 @@ struct QuickActionCard: View {
     }
 }
 
-// MARK: - Statistics Section
+// MARK: - Warm Up Cards Section
 extension MainPage {
-    private var statisticsSection: some View {
+    private var warmUpCardsSection: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
-            HStack {
-                Text("This Week")
-                    .riseOnHeading2()
-                    .foregroundColor(.typographyPrimary)
-                
-                Spacer()
-                
-                RiseOnButton.ghost("View All", size: .small) {
-                    print("View all stats")
-                }
-            }
+            Text("Quick Warm-ups")
+                .riseOnHeading2()
+                .foregroundColor(.typographyPrimary)
             
             LazyVGrid(
                 columns: Array(repeating: GridItem(.flexible(), spacing: DesignTokens.Spacing.md), count: 2),
                 spacing: DesignTokens.Spacing.md
             ) {
-                StatCard(
-                    title: "Workouts",
-                    value: "12",
-                    change: "+3 this week",
-                    isPositive: true
+                WarmUpCard(
+                    title: "Morning Stretch",
+                    duration: "5 min",
+                    icon: "figure.yoga"
                 )
                 
-                StatCard(
-                    title: "Calories Burned",
-                    value: "2,450",
-                    change: "Daily average",
-                    isPositive: true
-                )
-                
-                StatCard(
-                    title: "Active Minutes",
-                    value: "180",
-                    change: "+25 vs last week",
-                    isPositive: true
-                )
-                
-                StatCard(
-                    title: "Water Intake",
-                    value: "1.8L",
-                    change: "Goal: 2.0L",
-                    isPositive: false
+                WarmUpCard(
+                    title: "Quick Cardio",
+                    duration: "10 min", 
+                    icon: "figure.run"
                 )
             }
         }
+    }
+}
+
+// MARK: - Compact Muscle Group Card
+struct CompactMuscleGroupCard: View {
+    let muscleGroup: MuscleGroup
+    let exerciseCount: Int
+    let estimatedTime: Int
+    
+    var body: some View {
+        RiseOnCard(style: .basic, size: .medium) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
+                // Icon and title
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.primaryButton.opacity(0.2))
+                            .frame(width: 40, height: 40)
+                        
+                        Image(systemName: muscleGroup.icon)
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(.primaryButton)
+                    }
+                    
+                    Text(muscleGroup.displayName)
+                        .riseOnHeading4()
+                        .foregroundColor(.typographyPrimary)
+                        .lineLimit(1)
+                }
+                
+                Spacer()
+                
+                // Stats
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                    StatChip(
+                        icon: "list.bullet",
+                        text: "\(exerciseCount) exercises",
+                        color: .typographyGrey
+                    )
+                    
+                    StatChip(
+                        icon: "clock",
+                        text: "\(estimatedTime) min",
+                        color: .typographyGrey
+                    )
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 120)
+    }
+}
+
+// MARK: - Warm Up Card
+struct WarmUpCard: View {
+    let title: String
+    let duration: String
+    let icon: String
+    
+    var body: some View {
+        RiseOnCard(style: .basic, size: .medium) {
+            VStack(spacing: DesignTokens.Spacing.md) {
+                // Icon
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.primaryButton.opacity(0.2))
+                        .frame(width: 60, height: 60)
+                    
+                    Image(systemName: icon)
+                        .font(.system(size: 28, weight: .medium))
+                        .foregroundColor(.primaryButton)
+                }
+                
+                Spacer()
+                
+                // Info
+                VStack(spacing: DesignTokens.Spacing.xs) {
+                    Text(title)
+                        .riseOnHeading4()
+                        .foregroundColor(.typographyPrimary)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                    
+                    Text(duration)
+                        .riseOnCaption(.medium)
+                        .foregroundColor(.typographyGrey)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .frame(height: 140)
     }
 }
 

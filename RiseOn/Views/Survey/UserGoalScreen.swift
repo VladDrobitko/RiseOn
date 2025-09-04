@@ -56,8 +56,9 @@ struct GoalOptionCard: View {
     
     var body: some View {
         RiseOnCard(
-            style: .basic,
+            style: .selectable,
             size: .medium,
+            isSelected: isSelected,
             onTap: action
         ) {
             HStack(spacing: DesignTokens.Spacing.md) {
@@ -76,11 +77,11 @@ struct GoalOptionCard: View {
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                     Text(goal.rawValue)
                         .riseOnBodySmall(.medium)
-                        .foregroundColor(.typographyPrimary)
+                        .foregroundColor(isSelected ? .white : .typographyPrimary)
                     
                     Text(goal.description)
                         .riseOnCaption()
-                        .foregroundColor(.typographyGrey)
+                        .foregroundColor(isSelected ? .white.opacity(0.8) : .typographyGrey)
                         .lineLimit(2)
                 }
                 
@@ -94,12 +95,6 @@ struct GoalOptionCard: View {
             }
             .frame(height: 60)
         }
-        .background(isSelected ? .primaryButton : .clear)
-        .cornerRadius(DesignTokens.CornerRadius.md)
-        .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md)
-                .stroke(isSelected ? .primaryButton : Color.clear, lineWidth: 1)
-        )
     }
 }
 

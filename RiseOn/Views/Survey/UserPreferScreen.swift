@@ -90,8 +90,9 @@ struct PreferenceTagCard: View {
     
     var body: some View {
         RiseOnCard(
-            style: .basic,
+            style: .selectable,
             size: .compact,
+            isSelected: isSelected,
             onTap: action
         ) {
             VStack(spacing: DesignTokens.Spacing.sm) {
@@ -123,14 +124,6 @@ struct PreferenceTagCard: View {
             .frame(maxWidth: .infinity)
             .frame(height: 85)
         }
-        .background(isSelected ? .primaryButton : .clear)
-        .cornerRadius(DesignTokens.CornerRadius.sm)
-        .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.sm)
-                .stroke(isSelected ? .primaryButton : Color.clear, lineWidth: 1)
-        )
-        .scaleEffect(isSelected ? 1.02 : 1.0)
-        .animation(.easeInOut(duration: DesignTokens.Animation.fast), value: isSelected)
     }
 }
 
