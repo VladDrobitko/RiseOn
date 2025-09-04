@@ -10,7 +10,7 @@ import Foundation
 class SurveyViewModel: ObservableObject {
     @Published var name: String = ""
     @Published var age: Int? = nil
-    @Published var gender: Gender?
+    @Published var gender: Gender? = .male
     @Published var goal: Goal?
     @Published var height: Double? = nil
     @Published var weight: Double? = nil

@@ -21,9 +21,8 @@ struct UserGoalScreen: View {
             ) {
                 VStack(spacing: DesignTokens.Spacing.md) {
                     ForEach(Goal.allCases, id: \.self) { goal in
-                        SurveyOptionCard(
-                            title: goal.rawValue,
-                            subtitle: goal.description,
+                        GoalOptionCard(
+                            goal: goal,
                             isSelected: viewModel.goal == goal
                         ) {
                             viewModel.saveGoal(goal)
@@ -37,6 +36,70 @@ struct UserGoalScreen: View {
         .onAppear {
             viewModel.canProceedFromCurrentStep = viewModel.goal != nil
         }
+    }
+}
+
+// MARK: - Goal Option Card
+struct GoalOptionCard: View {
+    let goal: Goal
+    let isSelected: Bool
+    let action: () -> Void
+    
+    private var icon: String {
+        switch goal {
+        case .loseWeight: return "arrow.down.circle"
+        case .buildMuscle: return "dumbbell"
+        case .maintainWeight: return "equal.circle"
+        case .developFlexibility: return "figure.flexibility"
+        }
+    }
+    
+    var body: some View {
+        RiseOnCard(
+            style: .basic,
+            size: .medium,
+            onTap: action
+        ) {
+            HStack(spacing: DesignTokens.Spacing.md) {
+                // Icon
+                ZStack {
+                    Circle()
+                        .fill(Color.typographyGrey.opacity(0.2))
+                        .frame(width: 36, height: 36)
+                    
+                    Image(systemName: icon)
+                        .font(.system(size: 16))
+                        .foregroundColor(isSelected ? .white : .typographyGrey)
+                }
+                
+                // Content
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                    Text(goal.rawValue)
+                        .riseOnBodySmall(.medium)
+                        .foregroundColor(.typographyPrimary)
+                    
+                    Text(goal.description)
+                        .riseOnCaption()
+                        .foregroundColor(.typographyGrey)
+                        .lineLimit(2)
+                }
+                
+                Spacer()
+                
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(.primaryButton)
+                }
+            }
+            .frame(height: 60)
+        }
+        .background(isSelected ? .primaryButton : .clear)
+        .cornerRadius(DesignTokens.CornerRadius.md)
+        .overlay(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md)
+                .stroke(isSelected ? .primaryButton : Color.clear, lineWidth: 1)
+        )
     }
 }
 

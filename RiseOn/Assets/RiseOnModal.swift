@@ -316,7 +316,7 @@ struct SuccessModal: View {
             VStack(spacing: DesignTokens.Spacing.xl) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 64))
-                    .foregroundColor(.green)
+                    .foregroundColor(.primaryButton)
                 
                 VStack(spacing: DesignTokens.Spacing.sm) {
                     Text(title)

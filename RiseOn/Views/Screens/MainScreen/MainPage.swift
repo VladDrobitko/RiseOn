@@ -32,8 +32,6 @@ struct MainPage: View {
             .padding(.top, DesignTokens.Spacing.xl)
         }
         .background(Color.black.ignoresSafeArea(.all))
-        .navigationTitle("Main")
-        .navigationBarTitleDisplayMode(.large)
     }
 }
 

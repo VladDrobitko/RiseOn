@@ -9,11 +9,12 @@ import SwiftUI
 
 struct WelcomeToSurvey: View {
     @ObservedObject var viewModel: SurveyViewModel
+    @Binding var currentStep: Int
+    @Environment(\.dismiss) private var dismiss
     @State private var animateContent = false
     @State private var animateSteps = false
     @State private var currentStepIndex = 0
     @State private var autoScrollTimer: Timer?
-    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -23,237 +24,217 @@ struct WelcomeToSurvey: View {
                 .scaledToFill()
                 .ignoresSafeArea()
             
-            VStack {
-                // НОВЫЙ ТУЛБАР С КНОПКОЙ НАЗАД
-                HStack {
-                    // Кнопка назад
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(.horizontal)
-                            
-                    }
-                    .scaleEffect(animateContent ? 1.0 : 0.8)
-                    .opacity(animateContent ? 1.0 : 0.0)
-                    
-                    Spacer()
-                }
-                .padding(.horizontal)
-                .padding(.top, 60)
-                
-                // Логотип
-                VStack {
-                    Image("logoRiseOn")
-                        .scaleEffect(animateContent ? 1.0 : 0.8)
-                        .opacity(animateContent ? 1.0 : 0.0)
-                }
-                .padding(.top, 40)
-                
+            VStack(spacing: 0) {
                 Spacer()
                 
-                // Основной контент с анимацией
-                VStack(alignment: .leading, spacing: 5) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        
-                        Text("We'll ask you 4 quick questions to create your personalized fitness plan")
-                            .font(.title3)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.typographyPrimary)
-                            .opacity(animateContent ? 1.0 : 0.0)
-                    }
-                    .padding(.horizontal)
+                // Заголовок, описание и слайды
+                VStack(spacing: DesignTokens.Spacing.xl) {
+                    // Заголовок и описание
+                    headerSection
                     
-                    // Preview шагов как слайд-галерея
-                    VStack(spacing: 12) {
-                        // Заголовок галереи
-                        HStack {
-                            Text("Quick Preview")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundColor(.white)
-                            
-                            Spacer()
-                            
-                            Text("Swipe to see steps →")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                        .padding(.horizontal, 20)
-                        .opacity(animateSteps ? 1.0 : 0.0)
-                        
-                        // Горизонтальная прокрутка с ScrollViewReader
-                        ScrollViewReader { proxy in
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 12) {
-                                    ForEach(Array(surveySteps.enumerated()), id: \.offset) { index, step in
-                                        HStack(spacing: 8) {
-                                            // Иконка с номером
-                                            ZStack {
-                                                Circle()
-                                                    .fill(
-                                                        currentStepIndex == index ?
-                                                        LinearGradient.gradientDarkGreen :
-                                                        LinearGradient.gradientCard
-                                                    )
-                                                    .frame(width: 50, height: 50)
-                                                
-                                                VStack(spacing: 2) {
-                                                    Image(systemName: step.icon)
-                                                        .font(.system(size: 24, weight: .medium))
-                                                        .foregroundColor(.white)
-                                                }
-                                            }
-                                            .padding(.leading, 15)
-                                            
-                                            Spacer()
-                                            
-                                            // Информация
-                                            VStack(spacing: 4) {
-                                                Text(step.title)
-                                                    .font(.subheadline)
-                                                    .fontWeight(.semibold)
-                                                    .foregroundColor(.white)
-                                                    .multilineTextAlignment(.center)
-                                                    .lineLimit(1)
-                                                
-                                                Text(step.description)
-                                                    .font(.caption)
-                                                    .foregroundColor(.gray)
-                                                    .multilineTextAlignment(.center)
-                                                    .lineLimit(2)
-                                            }
-                                            .frame(width: 180)
-                                        }
-                                        .padding(.vertical, 12)
-                                        .padding(.horizontal, 8)
-                                        .frame(width: 280, height: 90)
-                                        .background(.ultraThinMaterial)
-                                        .cornerRadius(12)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 12)
-                                                .stroke(
-                                                    currentStepIndex == index ?
-                                                        Color.primaryButton.opacity(0.6) :
-                                                        Color.white.opacity(0.1),
-                                                    lineWidth: 0.8
-                                                )
-                                        )
-                                        .opacity(animateSteps ? 1.0 : 0.0)
-                                        .animation(.easeOut(duration: 0.4).delay(Double(index) * 0.1), value: animateSteps)
-                                        .animation(.easeInOut(duration: 0.3), value: currentStepIndex)
-                                        .id("card_\(index)")
-                                        .onTapGesture {
-                                            stopAutoScroll()
-                                            withAnimation(.easeInOut(duration: 0.3)) {
-                                                currentStepIndex = index
-                                            }
-                                        }
-                                    }
-                                }
-                                .padding(.horizontal, 20)
-                            }
-                            .onAppear {
-                                proxy.scrollTo("card_0", anchor: .center)
-                            }
-                            .onChange(of: currentStepIndex) { _, newIndex in
-                                withAnimation(.easeInOut(duration: 0.6)) {
-                                    proxy.scrollTo("card_\(newIndex)", anchor: .center)
-                                }
-                            }
-                        }
-                        .frame(height: 100)
-                        
-                        // Индикатор страниц (точки)
-                        HStack(spacing: 6) {
-                            ForEach(0..<4, id: \.self) { index in
-                                Circle()
-                                    .fill(index == currentStepIndex ? Color.primaryButton : Color.white.opacity(0.3))
-                                    .frame(width: 6, height: 6)
-                                    .animation(.easeInOut(duration: 0.2), value: currentStepIndex)
-                                    .onTapGesture {
-                                        stopAutoScroll()
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                            currentStepIndex = index
-                                        }
-                                    }
-                            }
-                        }
-                        .opacity(animateSteps ? 1.0 : 0.0)
+                    // Слайды карточек
+                    VStack(spacing: DesignTokens.Spacing.md) {
+                        stepsScrollView
+                        pageIndicator
                     }
-                    
-                    .padding(.vertical, 16)
+                    .padding(.horizontal, DesignTokens.Padding.screen)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-                .padding(.bottom, 140)
+                
+                // Кнопка действия
+                actionButtonSection
             }
-            
-            // Кнопка с улучшенным дизайном
-            VStack(spacing: 12) {
-                Button {
-                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                    impactFeedback.impactOccurred()
-                    
-                    // TODO: Перейти к следующему шагу опроса
-                    // Пока просто закрываем экран
-                    dismiss()
-                } label: {
-                    HStack {
-                        Text("Let's Get Started")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                        
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 16, weight: .semibold))
-                    }
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity, minHeight: 52)
-                    .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: [Color.primaryButton, Color.primaryButton.opacity(0.8)]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(16)
-                    .shadow(color: Color.primaryButton.opacity(0.3), radius: 8, x: 0, y: 4)
-                }
-                .scaleEffect(animateContent ? 1.0 : 0.9)
-                .opacity(animateContent ? 1.0 : 0.0)
-                .padding(.bottom, 20)
-            }
-            .padding(.horizontal, 32)
-            .padding(.bottom, 60)
         }
         .onAppear {
             viewModel.canProceedFromCurrentStep = true
-            
-            withAnimation(.easeOut(duration: 0.6)) {
-                animateContent = true
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                animateSteps = true
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                startAutoScroll()
-            }
+            startAnimations()
         }
         .onDisappear {
             autoScrollTimer?.invalidate()
         }
+        .overlay(alignment: .topLeading) {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(.typographyPrimary)
+                    .padding(12)
+                    .background(Circle().fill(.ultraThinMaterial))
+            }
+            .padding(.top, 60)
+            .padding(.leading, 20)
+        }
+    }
+}
+
+
+
+// MARK: - Header Section  
+extension WelcomeToSurvey {
+    
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+            Text("Let's Get to Know You")
+                .riseOnHeading1()
+                .foregroundColor(.typographyPrimary)
+                .opacity(animateContent ? 1.0 : 0.0)
+            
+            Text("We'll ask you 4 quick questions to create your personalized fitness plan")
+                .riseOnBody()
+                .foregroundColor(.typographyGrey)
+                .opacity(animateContent ? 1.0 : 0.0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, DesignTokens.Padding.screen)
     }
     
-    // MARK: - Auto Scroll Methods
+
+    
+    private var stepsScrollView: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: DesignTokens.Spacing.md) {
+                    ForEach(Array(surveySteps.enumerated()), id: \.offset) { index, step in
+                        stepCard(step: step, index: index, isActive: currentStepIndex == index)
+                            .id("card_\(index)")
+                            .onTapGesture {
+                                selectStep(index: index)
+                            }
+                    }
+                }
+                .padding(.horizontal, DesignTokens.Spacing.sm)
+            }
+            .onAppear {
+                proxy.scrollTo("card_0", anchor: .center)
+            }
+            .onChange(of: currentStepIndex) { _, newIndex in
+                withAnimation(.easeInOut(duration: 0.6)) {
+                    proxy.scrollTo("card_\(newIndex)", anchor: .center)
+                }
+            }
+        }
+        .frame(height: 100)
+        .opacity(animateSteps ? 1.0 : 0.0)
+    }
+    
+    private func stepCard(step: SurveyStep, index: Int, isActive: Bool) -> some View {
+        HStack(spacing: DesignTokens.Spacing.md) {
+            // Иконка
+            ZStack {
+                Circle()
+                    .fill(isActive ? Color.primaryButton : Color.typographyGrey.opacity(0.3))
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: step.icon)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(.black)
+            }
+            
+            // Информация
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+                Text(step.title)
+                    .riseOnBodySmall(.semibold)
+                    .foregroundColor(.typographyPrimary)
+                    .lineLimit(1)
+                
+                Text(step.description)
+                    .riseOnCaption()
+                    .foregroundColor(.typographyGrey)
+                    .lineLimit(2)
+            }
+            
+            Spacer()
+        }
+        .padding(DesignTokens.Spacing.md)
+        .frame(width: 240, height: 80)
+        .background(
+            RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
+                        .stroke(
+                            isActive ? Color.primaryButton.opacity(0.6) : Color.clear,
+                            lineWidth: 2
+                        )
+                )
+        )
+        .opacity(animateSteps ? 1.0 : 0.0)
+        .animation(.easeOut(duration: 0.4).delay(Double(index) * 0.1), value: animateSteps)
+        .animation(.easeInOut(duration: 0.3), value: currentStepIndex)
+    }
+    
+    private var pageIndicator: some View {
+        HStack(spacing: DesignTokens.Spacing.xs) {
+            ForEach(0..<4, id: \.self) { index in
+                Circle()
+                    .fill(index == currentStepIndex ? Color.primaryButton : Color.typographyGrey.opacity(0.3))
+                    .frame(width: 4, height: 4)
+                    .animation(.easeInOut(duration: 0.2), value: currentStepIndex)
+                    .onTapGesture {
+                        selectStep(index: index)
+                    }
+            }
+        }
+        .opacity(animateSteps ? 1.0 : 0.0)
+    }
+}
+
+// MARK: - Action Button Section
+extension WelcomeToSurvey {
+    private var actionButtonSection: some View {
+        VStack(spacing: DesignTokens.Spacing.md) {
+            RiseOnButton.primary("Let's Get Started", size: .large) {
+                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                impactFeedback.impactOccurred()
+                
+                // Переход к следующему шагу опроса
+                withAnimation(.easeInOut(duration: DesignTokens.Animation.normal)) {
+                    currentStep += 1
+                }
+            }
+            .scaleEffect(animateContent ? 1.0 : 0.9)
+            .opacity(animateContent ? 1.0 : 0.0)
+            
+            // Дополнительная информация
+            Text("Takes less than 2 minutes")
+                .riseOnCaption()
+                .foregroundColor(.typographyGrey.opacity(0.8))
+                .opacity(animateContent ? 1.0 : 0.0)
+        }
+        .padding(.horizontal, DesignTokens.Padding.screen)
+        .padding(.top, DesignTokens.Spacing.lg)
+        .padding(.bottom, DesignTokens.Spacing.xxxl * 2)
+    }
+}
+
+// MARK: - Helper Methods
+extension WelcomeToSurvey {
+    private func startAnimations() {
+        withAnimation(.easeOut(duration: 0.6)) {
+            animateContent = true
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            animateSteps = true
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            startAutoScroll()
+        }
+    }
+    
     private func startAutoScroll() {
         autoScrollTimer = Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) { _ in
             withAnimation(.easeInOut(duration: 0.5)) {
                 currentStepIndex = (currentStepIndex + 1) % 4
             }
+        }
+    }
+    
+    private func selectStep(index: Int) {
+        stopAutoScroll()
+        withAnimation(.easeInOut(duration: 0.3)) {
+            currentStepIndex = index
         }
     }
     
@@ -298,10 +279,9 @@ struct SurveyStep {
 
 #Preview {
     let viewModel = SurveyViewModel()
-    let appState = AppState()
+    @State var currentStep = 1
     
-    WelcomeToSurvey(viewModel: viewModel)
-        .environmentObject(appState)
+    return WelcomeToSurvey(viewModel: viewModel, currentStep: .constant(1))
         .background(Color.black)
         .preferredColorScheme(.dark)
 }

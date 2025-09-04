@@ -45,6 +45,7 @@ class AppState: ObservableObject {
         // Небольшая задержка для плавного закрытия модального окна
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.isAuthenticated = true
+            self.markFirstLaunchCompleted() // ИСПРАВЛЕНО: Отмечаем первый запуск как завершенный
             UserDefaults.standard.set(true, forKey: "isAuthenticated")
             self.checkSurveyCompletion()
         }

@@ -171,7 +171,7 @@ struct RiseOnTextField: View {
                     // Success/Error Indicator
                     if currentState == .success {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
+                            .foregroundColor(.primaryButton)
                             .font(.system(size: DesignTokens.Sizes.iconSmall))
                     } else if currentState == .error {
                         Image(systemName: "exclamationmark.circle.fill")

@@ -55,15 +55,7 @@ struct DietOptionCard: View {
         }
     }
     
-    private var color: Color {
-        switch diet {
-        case .vegetarian: return .green
-        case .vegan: return .mint
-        case .keto: return .orange
-        case .mediterranean: return .blue
-        case .noAnyDietes: return .gray
-        }
-    }
+
     
     private var tag: String? {
         switch diet {
@@ -76,36 +68,36 @@ struct DietOptionCard: View {
     
     var body: some View {
         RiseOnCard(
-            style: isSelected ? .gradient : .basic,
-            size: .large,
+            style: .basic,
+            size: .medium,
             onTap: action
         ) {
-            HStack(spacing: DesignTokens.Spacing.lg) {
+            HStack(spacing: DesignTokens.Spacing.md) {
                 // Icon
                 ZStack {
                     Circle()
-                        .fill(color.opacity(0.2))
-                        .frame(width: 50, height: 50)
+                        .fill(Color.typographyGrey.opacity(0.2))
+                        .frame(width: 36, height: 36)
                     
                     Image(systemName: icon)
-                        .font(.system(size: DesignTokens.Sizes.iconMedium))
-                        .foregroundColor(isSelected ? color : .typographyGrey)
+                        .font(.system(size: 16))
+                        .foregroundColor(isSelected ? .white : .typographyGrey)
                 }
                 
                 // Content
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                     HStack {
                         Text(diet.rawValue)
-                            .riseOnHeading4()
+                            .riseOnBodySmall(.medium)
                             .foregroundColor(.typographyPrimary)
                         
                         if let tag = tag {
                             Text(tag)
-                                .riseOnCaption(.medium)
-                                .foregroundColor(color)
-                                .padding(.horizontal, DesignTokens.Spacing.sm)
-                                .padding(.vertical, DesignTokens.Spacing.xs)
-                                .background(color.opacity(0.2))
+                                .font(.system(size: 10))
+                                .foregroundColor(isSelected ? .white : .typographyGrey)
+                                .padding(.horizontal, DesignTokens.Spacing.xs)
+                                .padding(.vertical, 2)
+                                .background(Color.typographyGrey.opacity(0.2))
                                 .cornerRadius(DesignTokens.CornerRadius.xs)
                         }
                         
@@ -113,21 +105,24 @@ struct DietOptionCard: View {
                     }
                     
                     Text(diet.description)
-                        .riseOnBodySmall()
+                        .riseOnCaption()
                         .foregroundColor(.typographyGrey)
                         .lineLimit(2)
                 }
                 
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.title3)
+                        .font(.system(size: 16))
                         .foregroundColor(.primaryButton)
                 }
             }
+            .frame(height: 60)
         }
+        .background(isSelected ? .primaryButton : .clear)
+        .cornerRadius(DesignTokens.CornerRadius.md)
         .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
-                .stroke(isSelected ? color : Color.clear, lineWidth: 2)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md)
+                .stroke(isSelected ? .primaryButton : Color.clear, lineWidth: 1)
         )
     }
 }

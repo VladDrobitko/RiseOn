@@ -25,10 +25,8 @@ struct MainApp: View {
                             }
                         }
                     }
-            } else if appState.isFirstLaunch {
-                StartScreenView()
             } else if appState.isAuthenticated {
-                MainTabView()
+                MainTabInterface()
             } else {
                 StartScreenView()
             }
@@ -39,58 +37,6 @@ struct MainApp: View {
         .onAppear {
             appState.updateModelContext(modelContext)
         }
-    }
-}
-
-struct MainTabView: View {
-    var body: some View {
-        TabView {
-            NavigationStack {
-                MainPage()
-            }
-            .tabItem {
-                Image("main")
-                Text("Main")
-            }
-            .tag(0)
-            
-            NavigationStack {
-                WorkoutPage()
-            }
-            .tabItem {
-                Image("workout")
-                Text("Workout")
-            }
-            .tag(1)
-            
-            NavigationStack {
-                NutritionPage()
-            }
-            .tabItem {
-                Image("nutrition")
-                Text("Nutrition")
-            }
-            .tag(2)
-            
-            NavigationStack {
-                ProgressPage()
-            }
-            .tabItem {
-                Image("stats")
-                Text("Progress")
-            }
-            .tag(3)
-            
-            NavigationStack {
-                ProfileTabPage()
-            }
-            .tabItem {
-                Image("user")
-                Text("Profile")
-            }
-            .tag(4)
-        }
-        .tint(.primaryButton)
     }
 }
 
@@ -115,30 +61,6 @@ struct SplashScreen: View {
                     }
                 
             }
-        }
-    }
-}
-
-struct ProfileTabPage: View {
-    @EnvironmentObject var appState: AppState
-    
-    var body: some View {
-        NavigationView {
-            List {
-                Section("Survey") {
-                    NavigationLink("Complete Survey") {
-                        SurveyCoordinatorView(viewModel: SurveyViewModel())
-                    }
-                }
-                
-                Section {
-                    Button("Logout") {
-                        appState.logout()
-                    }
-                    .foregroundColor(.red)
-                }
-            }
-            .navigationTitle("Profile")
         }
     }
 }

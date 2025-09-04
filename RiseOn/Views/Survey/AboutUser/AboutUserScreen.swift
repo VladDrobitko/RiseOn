@@ -29,7 +29,7 @@ struct AboutUserScreen: View {
         ZStack(alignment: .bottom) {
             Color.black.ignoresSafeArea()
             
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.sectionSpacing) {
                     // User Info Section
                     userInfoSection
@@ -47,7 +47,6 @@ struct AboutUserScreen: View {
                 }
                 .padding(DesignTokens.Padding.screen)
             }
-            .modifier(KeyboardAdaptive())
             .background(Color.black)
             .onAppear {
                 loadUserData()
@@ -57,7 +56,7 @@ struct AboutUserScreen: View {
                 saveUserData()
             }
         }
-        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .keyboardToolbar()
     }
 }
 
@@ -84,22 +83,20 @@ extension AboutUserScreen {
     }
     
     private var genderSelectionSection: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.lg) {
+        HStack {
             Text("Your gender")
                 .riseOnHeading3()
                 .foregroundColor(.typographyPrimary)
             
-            HStack(spacing: DesignTokens.Spacing.lg) {
-                ForEach(Gender.allCases, id: \.self) { gender in
-                    GenderSelectionCard(
-                        gender: gender,
-                        isSelected: viewModel.gender == gender
-                    ) {
-                        viewModel.saveGender(gender)
-                        checkButtonState()
-                    }
+            Spacer()
+            
+            CompactGenderSegmentedControl(selectedGender: Binding(
+                get: { viewModel.gender! },
+                set: { gender in
+                    viewModel.saveGender(gender)
+                    checkButtonState()
                 }
-            }
+            ))
         }
     }
     
@@ -181,35 +178,47 @@ extension AboutUserScreen {
     }
 }
 
-// MARK: - Gender Selection Card
-struct GenderSelectionCard: View {
-    let gender: Gender
-    let isSelected: Bool
-    let action: () -> Void
+// MARK: - Compact Gender Segmented Control
+struct CompactGenderSegmentedControl: View {
+    @Binding var selectedGender: Gender
     
     var body: some View {
-        RiseOnCard(
-            style: isSelected ? .gradient : .basic,
-            size: .medium,
-            onTap: action
-        ) {
-            VStack(spacing: DesignTokens.Spacing.sm) {
-                Image(gender == .male ? "iconBoy" : "iconGirl")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: DesignTokens.Sizes.iconLarge)
-                    .foregroundColor(isSelected ? .primaryButton : .typographyGrey)
-                
-                Text(gender.description)
-                    .riseOnBodySmall(.medium)
-                    .foregroundColor(isSelected ? .typographyPrimary : .typographyGrey)
+        HStack(spacing: 2) {
+            ForEach(Gender.allCases, id: \.self) { gender in
+                HStack(spacing: DesignTokens.Spacing.xs) {
+                    Image(gender == .male ? "iconBoy" : "iconGirl")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 16)
+                        .foregroundColor(selectedGender == gender ? .white : .typographyGrey)
+                    
+                    Text(gender.description)
+                        .riseOnCaption(.medium)
+                        .foregroundColor(selectedGender == gender ? .white : .typographyGrey)
+                }
+                .padding(.horizontal, DesignTokens.Spacing.sm)
+                .padding(.vertical, DesignTokens.Spacing.xs)
+                .background {
+                    if selectedGender == gender {
+                        LinearGradient.gradientDarkGreen
+                    } else {
+                        Color.clear
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.sm))
+                .onTapGesture {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        selectedGender = gender
+                    }
+                }
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 80)
         }
+        .padding(2)
+        .background(Color.card)
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.sm))
         .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
-                .stroke(isSelected ? Color.primaryButton : Color.clear, lineWidth: 2)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.sm)
+                .stroke(Color.typographyGrey.opacity(0.3), lineWidth: 1)
         )
     }
 }
@@ -298,3 +307,4 @@ extension AboutUserScreen {
         .background(Color.black)
         .preferredColorScheme(.dark)
 }
+

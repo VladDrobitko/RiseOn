@@ -65,36 +65,37 @@ struct ActivityLevelCard: View {
     
     var body: some View {
         RiseOnCard(
-            style: isSelected ? .gradient : .basic,
-            size: .large,
+            style: .basic,
+            size: .medium,
             onTap: action
         ) {
-            HStack(spacing: DesignTokens.Spacing.lg) {
+            HStack(spacing: DesignTokens.Spacing.md) {
                 // Icon and intensity indicator
-                VStack(spacing: DesignTokens.Spacing.sm) {
+                VStack(spacing: DesignTokens.Spacing.xs) {
                     ZStack {
                         Circle()
-                            .fill(intensityIndicator.0.opacity(0.2))
-                            .frame(width: 50, height: 50)
+                            .fill(Color.typographyGrey.opacity(0.2))
+                            .frame(width: 36, height: 36)
                         
                         Image(systemName: icon)
-                            .font(.system(size: DesignTokens.Sizes.iconMedium))
-                            .foregroundColor(isSelected ? .primaryButton : intensityIndicator.0)
+                            .font(.system(size: 16))
+                            .foregroundColor(isSelected ? .white : .typographyGrey)
                     }
                     
                     Text(intensityIndicator.1)
                         .riseOnCaption(.medium)
-                        .foregroundColor(intensityIndicator.0)
+                        .foregroundColor(isSelected ? .white : .typographyGrey)
+                        .font(.system(size: 10))
                 }
                 
                 // Content
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                     Text(level.rawValue)
-                        .riseOnHeading4()
+                        .riseOnBodySmall(.medium)
                         .foregroundColor(.typographyPrimary)
                     
                     Text(level.description)
-                        .riseOnBodySmall()
+                        .riseOnCaption()
                         .foregroundColor(.typographyGrey)
                         .lineLimit(2)
                 }
@@ -103,14 +104,17 @@ struct ActivityLevelCard: View {
                 
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.title3)
+                        .font(.system(size: 16))
                         .foregroundColor(.primaryButton)
                 }
             }
+            .frame(height: 60)
         }
+        .background(isSelected ? .primaryButton : .clear)
+        .cornerRadius(DesignTokens.CornerRadius.md)
         .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
-                .stroke(isSelected ? Color.primaryButton : Color.clear, lineWidth: 2)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md)
+                .stroke(isSelected ? .primaryButton : Color.clear, lineWidth: 1)
         )
     }
 }

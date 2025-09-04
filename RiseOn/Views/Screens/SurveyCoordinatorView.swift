@@ -32,7 +32,7 @@ struct SurveyCoordinatorView: View {
                     Group {
                         switch currentStep {
                         case 1:
-                            WelcomeToSurvey(viewModel: viewModel)
+                            WelcomeToSurvey(viewModel: viewModel, currentStep: $currentStep)
                                 .transition(.opacity)
                         case 2:
                             AboutUserScreen(viewModel: viewModel, currentStep: .constant(2))
@@ -71,7 +71,10 @@ struct SurveyCoordinatorView: View {
                 }
             }
         }
-        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
         .onAppear {
             if currentStep == 1 {
                 viewModel.canProceedFromCurrentStep = true
@@ -86,19 +89,19 @@ extension SurveyCoordinatorView {
         VStack(spacing: 0) {
             HStack {
                 // Кнопка назад
-                RiseOnButton.ghost("", size: .small) {
+                Button {
                     if currentStep > 1 {
                         withAnimation(.easeInOut(duration: DesignTokens.Animation.normal)) {
                             currentStep -= 1
                         }
                     }
-                }
-                .overlay(
-                    Image("chevronLeft")
-                        .font(.system(size: 16, weight: .medium))
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 18, weight: .medium))
                         .foregroundColor(.typographyPrimary)
-                )
-                .frame(width: 44, height: 44)
+                        .padding(12)
+                        .background(Circle().fill(.ultraThinMaterial))
+                }
                 
                 Spacer()
                 

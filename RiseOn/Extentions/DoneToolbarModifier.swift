@@ -17,4 +17,17 @@ extension View {
             for: nil
         )
     }
+    
+    func keyboardToolbar() -> some View {
+        self.toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") {
+                    hideKeyboard()
+                }
+                .foregroundColor(.primaryButton)
+                .font(.system(size: 16, weight: .medium))
+            }
+        }
+    }
 }

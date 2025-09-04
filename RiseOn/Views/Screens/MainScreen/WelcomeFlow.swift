@@ -48,7 +48,7 @@ struct MainTabInterface: View {
             // Главная вкладка
             NavigationStack {
                 MainPage()
-                    .applyAppStyle() // Единый стиль
+                    .applyAppStyle(title: "Main")
             }
             .tabItem {
                 Image("main")
@@ -59,7 +59,7 @@ struct MainTabInterface: View {
             // Тренировки
             NavigationStack {
                 WorkoutPage()
-                    .applyAppStyle()
+                    .applyAppStyle(title: "Workout")
             }
             .tabItem {
                 Image("workout")
@@ -70,7 +70,7 @@ struct MainTabInterface: View {
             // Питание
             NavigationStack {
                 NutritionPage()
-                    .applyAppStyle()
+                    .applyAppStyle(title: "Nutrition")
             }
             .tabItem {
                 Image("nutrition")
@@ -81,27 +81,16 @@ struct MainTabInterface: View {
             // Прогресс
             NavigationStack {
                 ProgressPage()
-                    .applyAppStyle()
+                    .applyAppStyle(title: "Progress")
             }
             .tabItem {
                 Image("stats")
                 Text("Progress")
             }
             .tag(3)
-            
-            // Профиль (здесь будет опрос)
-            NavigationStack {
-                ProfileMainPage()
-                    .applyAppStyle()
-            }
-            .tabItem {
-                Image("user")
-                Text("Profile")
-            }
-            .tag(4)
         }
         .environmentObject(mainTabCoordinator)
-        .tint(.primaryButton) // Цвет выбранной вкладки
+        .accentColor(.primaryButton) // Цвет выбранной вкладки
         .onAppear {
             setupTabBarAppearance()
         }
@@ -116,17 +105,26 @@ struct MainTabInterface: View {
         // Цвет невыбранных элементов
         appearance.stackedLayoutAppearance.normal.iconColor = UIColor.gray
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
-            .foregroundColor: UIColor.gray
+            .foregroundColor: UIColor.gray,
+            .font: UIFont.systemFont(ofSize: 11, weight: .medium)
         ]
         
-        // Цвет выбранных элементов
+        // Цвет и размер выбранных элементов
         appearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color.primaryButton)
         appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
-            .foregroundColor: UIColor(Color.primaryButton)
+            .foregroundColor: UIColor(Color.primaryButton),
+            .font: UIFont.systemFont(ofSize: 12, weight: .semibold) // Немного больше
         ]
         
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
+        
+        // Дополнительная настройка для увеличения иконок
+        UITabBar.appearance().itemPositioning = .centered
+        
+        // Убеждаемся что tint color применяется
+        UITabBar.appearance().tintColor = UIColor(Color.primaryButton)
+        UITabBar.appearance().unselectedItemTintColor = UIColor.gray
     }
 }
 
@@ -164,28 +162,123 @@ class MainTabCoordinator: ObservableObject {
     }
 }
 
+// MARK: - Custom Toolbar Component
+struct CustomMainToolbar: View {
+    let title: String
+    @State private var showingProfile = false
+    
+    var body: some View {
+        ZStack {
+            // Заголовок по центру экрана
+            Text(title)
+                .riseOnHeading3()
+                .foregroundColor(.typographyPrimary)
+            
+            // Боковые кнопки
+            HStack {
+                // Кнопка профиля слева
+                NavigationLink(destination: ProfileMainPage()) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.typographyGrey.opacity(0.2))
+                            .frame(width: 32, height: 32)
+                        
+                        Image(systemName: "person.fill")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.typographyPrimary)
+                    }
+                }
+                
+                Spacer()
+                
+                // Кнопки справа
+                HStack(spacing: DesignTokens.Spacing.md) {
+                    // Кнопка избранного
+                    Button {
+                        // TODO: Открыть избранное
+                    } label: {
+                        Image(systemName: "heart")
+                            .font(.system(size: 20, weight: .light))
+                            .foregroundColor(.typographyPrimary)
+                    }
+                    
+                    // Кнопка поиска
+                    Button {
+                        // TODO: Открыть поиск
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 20, weight: .light))
+                            .foregroundColor(.typographyPrimary)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, DesignTokens.Padding.screen)
+        .padding(.top, 8)
+        .frame(height: 52)
+        .background(Color.black.ignoresSafeArea(edges: .top))
+    }
+}
+
 // MARK: - App Style Modifier (единый стиль навигации)
 struct AppStyleModifier: ViewModifier {
+    let title: String
+    
     func body(content: Content) -> some View {
-        content
-            .navigationBarTitleDisplayMode(.large)
-            .toolbarBackground(.black, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+        VStack(spacing: 0) {
+            CustomMainToolbar(title: title)
+            
+            content
+                .navigationBarHidden(true)
+        }
+        .background(Color.black.ignoresSafeArea())
     }
 }
 
 extension View {
-    func applyAppStyle() -> some View {
-        self.modifier(AppStyleModifier())
+    func applyAppStyle(title: String = "") -> some View {
+        self.modifier(AppStyleModifier(title: title))
     }
 }
 
 // MARK: - Profile Main Page (новая страница профиля с опросом)
 struct ProfileMainPage: View {
     @EnvironmentObject var appState: AppState
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        List {
+        VStack(spacing: 0) {
+            // Кастомный toolbar
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(.typographyPrimary)
+                        .padding(12)
+                        .background(Circle().fill(.ultraThinMaterial))
+                }
+                
+                Spacer()
+                
+                Text("Profile")
+                    .riseOnHeading3()
+                    .foregroundColor(.typographyPrimary)
+                
+                Spacer()
+                
+                // Пустое место для симметрии
+                Color.clear
+                    .frame(width: 44, height: 44)
+            }
+            .padding(.horizontal, DesignTokens.Padding.screen)
+            .padding(.top, 8)
+            .frame(height: 52)
+            .background(Color.black.ignoresSafeArea(edges: .top))
+            
+            // Контент
+            List {
             Section("Personalization") {
                 HStack {
                     VStack(alignment: .leading) {
@@ -202,19 +295,9 @@ struct ProfileMainPage: View {
                 }
                 .padding(.vertical, 4)
                 
-                NavigationLink("Complete Survey") {
+                NavigationLink(appState.hasCompletedSurvey ? "Retake Survey" : "Complete Survey") {
                     SurveyCoordinatorView(viewModel: SurveyViewModel())
-                        .navigationBarBackButtonHidden(true)
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarLeading) {
-                                Button("Cancel") {
-                                    // Возврат назад
-                                }
-                            }
-                        }
                 }
-                .disabled(appState.hasCompletedSurvey)
-                .opacity(appState.hasCompletedSurvey ? 0.6 : 1.0)
             }
             
             Section("Account") {
@@ -240,10 +323,12 @@ struct ProfileMainPage: View {
                 }
                 .foregroundColor(.red)
             }
+            }
+            .listStyle(InsetGroupedListStyle())
+            .scrollContentBackground(.hidden)
+            .background(Color.black)
         }
-        .navigationTitle("Profile")
-        .listStyle(InsetGroupedListStyle())
-        .scrollContentBackground(.hidden)
-        .background(Color.black)
+        .navigationBarHidden(true)
+        .toolbar(.hidden, for: .tabBar)
     }
 }

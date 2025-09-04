@@ -12,14 +12,12 @@ struct UserPreferScreen: View {
     @Binding var currentStep: Int
     
     var body: some View {
-        ZStack(alignment: .top) {
-            Color.black.ignoresSafeArea()
-            
+        ScrollView(.vertical, showsIndicators: false) {
             SurveyStepCard(
                 title: "What do you prefer?",
                 subtitle: "Select your preferred training types (you can choose multiple)"
             ) {
-                VStack(spacing: DesignTokens.Spacing.lg) {
+                VStack(spacing: DesignTokens.Spacing.md) {
                     // Selection Grid
                     LazyVGrid(
                         columns: Array(repeating: GridItem(.flexible(), spacing: DesignTokens.Spacing.sm), count: 2),
@@ -43,9 +41,10 @@ struct UserPreferScreen: View {
                             HStack {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(.primaryButton)
+                                    .font(.caption)
                                 
                                 Text("\(viewModel.selectedTrainingTypes.count) types selected")
-                                    .riseOnBodySmall(.medium)
+                                    .riseOnCaption()
                                     .foregroundColor(.typographyPrimary)
                                 
                                 Spacer()
@@ -53,9 +52,13 @@ struct UserPreferScreen: View {
                         }
                         .padding(.horizontal, DesignTokens.Padding.screen)
                     }
+                    
+                    // Добавляем отступ снизу для кнопок
+                    Color.clear.frame(height: 120)
                 }
             }
         }
+        .background(Color.black)
         .onAppear {
             viewModel.canProceedFromCurrentStep = !viewModel.selectedTrainingTypes.isEmpty
         }
@@ -83,56 +86,48 @@ struct PreferenceTagCard: View {
         }
     }
     
-    private var color: Color {
-        switch type {
-        case .balance: return .blue
-        case .fitness: return .green
-        case .strength: return .red
-        case .cardio: return .pink
-        case .yoga: return .purple
-        case .stretching: return .orange
-        case .endurance: return .cyan
-        case .weightlifting: return .brown
-        case .hit: return .yellow
-        case .running: return .mint
-        }
-    }
+
     
     var body: some View {
         RiseOnCard(
-            style: isSelected ? .gradient : .basic,
-            size: .medium,
+            style: .basic,
+            size: .compact,
             onTap: action
         ) {
             VStack(spacing: DesignTokens.Spacing.sm) {
                 ZStack {
                     Circle()
-                        .fill((isSelected ? color : Color.typographyGrey).opacity(0.2))
+                        .fill(Color.typographyGrey.opacity(0.2))
                         .frame(width: 40, height: 40)
                     
                     Image(systemName: icon)
-                        .font(.system(size: DesignTokens.Sizes.iconSmall))
-                        .foregroundColor(isSelected ? color : .typographyGrey)
+                        .font(.system(size: 18))
+                        .foregroundColor(isSelected ? .white : .typographyGrey)
                 }
                 
                 Text(type.rawValue)
                     .riseOnBodySmall(.medium)
-                    .foregroundColor(isSelected ? .typographyPrimary : .typographyGrey)
+                    .foregroundColor(isSelected ? .white : .typographyGrey)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                 
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
-                        .font(.caption)
+                        .font(.system(size: 12))
                         .foregroundColor(.primaryButton)
+                } else {
+                    // Пустое место для баланса
+                    Color.clear.frame(height: 12)
                 }
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 100)
+            .frame(height: 85)
         }
+        .background(isSelected ? .primaryButton : .clear)
+        .cornerRadius(DesignTokens.CornerRadius.sm)
         .overlay(
-            RoundedRectangle(cornerRadius: DesignTokens.Radius.card)
-                .stroke(isSelected ? color : Color.clear, lineWidth: 2)
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.sm)
+                .stroke(isSelected ? .primaryButton : Color.clear, lineWidth: 1)
         )
         .scaleEffect(isSelected ? 1.02 : 1.0)
         .animation(.easeInOut(duration: DesignTokens.Animation.fast), value: isSelected)
