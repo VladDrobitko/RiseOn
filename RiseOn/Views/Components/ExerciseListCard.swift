@@ -15,19 +15,8 @@ struct ExerciseListCard: View {
         Button(action: onTap) {
             RiseOnCard(style: .basic, size: .medium) {
                 HStack(spacing: DesignTokens.Spacing.md) {
-                    // Exercise Image
-                    ZStack {
-                        RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.sm)
-                            .fill(Color.typographyGrey.opacity(0.1))
-                            .frame(width: 80, height: 80)
-                        
-                        Image(exercise.imageName)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 80, height: 80)
-                            .clipped()
-                            .cornerRadius(DesignTokens.CornerRadius.sm)
-                    }
+                    // Exercise Image - UPDATED
+                    ExerciseListImage(exercise: exercise)
                     
                     // Exercise Info
                     VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
@@ -36,7 +25,8 @@ struct ExerciseListCard: View {
                             Text(exercise.name)
                                 .riseOnHeading4()
                                 .foregroundColor(.typographyPrimary)
-                                .lineLimit(1)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.leading)
                             
                             DifficultyBadge(difficulty: exercise.difficulty)
                         }
@@ -60,31 +50,33 @@ struct ExerciseListCard: View {
                         
                         // Equipment tags
                         if !exercise.equipment.isEmpty {
-                            HStack(spacing: DesignTokens.Spacing.xs) {
-                                ForEach(Array(exercise.equipment.prefix(2)), id: \.self) { equipment in
-                                    EquipmentTag(equipment: equipment)
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: DesignTokens.Spacing.xs) {
+                                    ForEach(exercise.equipment.prefix(2), id: \.self) { equipment in
+                                        EquipmentTag(equipment: equipment)
+                                    }
+                                    
+                                    if exercise.equipment.count > 2 {
+                                        Text("+\(exercise.equipment.count - 2)")
+                                            .riseOnCaption()
+                                            .foregroundColor(.typographyGrey)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 4)
+                                                    .fill(Color.typographyGrey.opacity(0.1))
+                                            )
+                                    }
                                 }
-                                
-                                if exercise.equipment.count > 2 {
-                                    Text("+\(exercise.equipment.count - 2)")
-                                        .riseOnCaption()
-                                        .foregroundColor(.typographyGrey)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 4)
-                                                .fill(Color.typographyGrey.opacity(0.1))
-                                        )
-                                }
-                                
-                                Spacer()
                             }
                         }
                     }
                     
-                    // Arrow
+                    Spacer()
+                    
+                    // Chevron icon
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.typographyGrey)
                 }
             }
@@ -92,6 +84,8 @@ struct ExerciseListCard: View {
         .buttonStyle(PlainButtonStyle())
     }
 }
+
+// MARK: - Supporting Components
 
 // MARK: - Difficulty Badge
 struct DifficultyBadge: View {
@@ -161,9 +155,30 @@ struct EquipmentTag: View {
         variations: []
     )
     
-    return VStack(spacing: 16) {
+    VStack(spacing: 16) {
         ExerciseListCard(exercise: mockExercise) {
             print("Exercise tapped")
+        }
+        
+        // Example with no equipment
+        ExerciseListCard(exercise: Exercise(
+            id: "2",
+            name: "Push-Ups",
+            description: "Classic bodyweight exercise",
+            instructions: [],
+            muscleGroup: .chest,
+            difficulty: .beginner,
+            duration: 10,
+            calories: 80,
+            equipment: [],
+            imageName: "push_ups",
+            videoName: nil,
+            resistanceIntensity: .light,
+            targetMuscles: [],
+            tips: [],
+            variations: []
+        )) {
+            print("Push-ups tapped")
         }
     }
     .padding()

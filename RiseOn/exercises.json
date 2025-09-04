@@ -2,16 +2,14 @@
   {
     "id": "1",
     "name": "Dumbbell Squat",
-    "description": "The dumbbell squat is a strength exercise that primarily targets the muscles of the lower body, including the quads, glutes, and hamstrings. To perform dumbbell squats, you hold a dumbbell in each hand at your sides, or one dumbbell with both hands, stand with your feet shoulder-width apart, and lower your body by bending your knees and pushing your hips back, as if you were sitting in a chair. Then you stand up pushing through your heels and engaging your leg muscles.",
+    "description": "The dumbbell squat is a strength exercise that primarily targets the muscles of the lower body, including the quads, glutes, and hamstrings.",
     "instructions": [
       "Stand with feet shoulder-width apart",
-      "Hold dumbbells at your sides or one dumbbell with both hands",
-      "Keep your chest up and core engaged",
+      "Hold dumbbells at your sides",
       "Lower your body by bending your knees",
       "Push your hips back as if sitting in a chair",
-      "Go down until your thighs are parallel to the floor",
-      "Push through your heels to return to starting position",
-      "Repeat for desired number of reps"
+      "Keep your chest up and core engaged",
+      "Return to starting position"
     ],
     "muscleGroup": "legs",
     "difficulty": "intermediate",
@@ -19,266 +17,24 @@
     "calories": 120,
     "equipment": ["dumbbells"],
     "imageName": "dumbbell_squat",
-    "videoName": "dumbbell_squat_video",
+    "videoName": null,
     "resistanceIntensity": "medium",
-    "targetMuscles": ["Quadriceps", "Glutes", "Hamstrings", "Calves"],
+    "targetMuscles": ["Quadriceps", "Glutes", "Hamstrings"],
     "tips": [
       "Keep your knees in line with your toes",
       "Don't let your knees cave inward",
-      "Maintain a neutral spine throughout the movement",
-      "Start with lighter weights to master the form"
+      "Keep your weight on your heels"
     ],
     "variations": [
       "Goblet Squat",
       "Sumo Squat",
-      "Split Squat",
-      "Jump Squat"
+      "Bulgarian Split Squat"
     ]
   },
   {
     "id": "2",
-    "name": "Push-Up",
-    "description": "The push-up is a classic bodyweight exercise that targets the chest, shoulders, and triceps. It's an excellent compound movement that also engages the core for stability.",
-    "instructions": [
-      "Start in a plank position with hands slightly wider than shoulders",
-      "Keep your body in a straight line from head to heels",
-      "Lower your chest toward the floor",
-      "Push back up to starting position",
-      "Keep your core engaged throughout"
-    ],
-    "muscleGroup": "chest",
-    "difficulty": "beginner",
-    "duration": 10,
-    "calories": 80,
-    "equipment": ["none"],
-    "imageName": "push_up",
-    "videoName": null,
-    "resistanceIntensity": "low",
-    "targetMuscles": ["Pectorals", "Deltoids", "Triceps", "Core"],
-    "tips": [
-      "Don't let your hips sag",
-      "Keep your head in neutral position",
-      "Control the movement on both up and down phases"
-    ],
-    "variations": [
-      "Incline Push-Up",
-      "Decline Push-Up",
-      "Diamond Push-Up",
-      "Wide-Grip Push-Up"
-    ]
-  },
-  {
-    "id": "3",
-    "name": "Deadlift",
-    "description": "The deadlift is one of the most effective compound exercises for building overall strength. It targets the posterior chain including the hamstrings, glutes, and lower back.",
-    "instructions": [
-      "Stand with feet hip-width apart, bar over mid-foot",
-      "Bend at hips and knees to grip the bar",
-      "Keep your chest up and back straight",
-      "Drive through your heels to lift the bar",
-      "Extend hips and knees simultaneously",
-      "Stand tall with shoulders back",
-      "Lower the bar by pushing hips back first",
-      "Keep the bar close to your body throughout"
-    ],
-    "muscleGroup": "back",
-    "difficulty": "advanced",
-    "duration": 20,
-    "calories": 180,
-    "equipment": ["barbell"],
-    "imageName": "deadlift",
-    "videoName": "deadlift_video",
-    "resistanceIntensity": "high",
-    "targetMuscles": ["Hamstrings", "Glutes", "Erector Spinae", "Traps", "Lats"],
-    "tips": [
-      "Keep the bar close to your body",
-      "Don't round your back",
-      "Start with lighter weight to perfect form",
-      "Engage your core throughout the movement"
-    ],
-    "variations": [
-      "Romanian Deadlift",
-      "Sumo Deadlift",
-      "Single-Leg Deadlift",
-      "Trap Bar Deadlift"
-    ]
-  },
-  {
-    "id": "4",
-    "name": "Overhead Press",
-    "description": "The overhead press is a fundamental upper body exercise that builds shoulder strength and stability. It also engages the core for balance and support.",
-    "instructions": [
-      "Stand with feet shoulder-width apart",
-      "Hold the bar at shoulder level with overhand grip",
-      "Keep your core tight and glutes engaged",
-      "Press the bar straight up overhead",
-      "Lock out your arms at the top",
-      "Lower the bar back to shoulder level",
-      "Keep your head in neutral position"
-    ],
-    "muscleGroup": "shoulders",
-    "difficulty": "intermediate",
-    "duration": 15,
-    "calories": 100,
-    "equipment": ["barbell"],
-    "imageName": "overhead_press",
-    "videoName": "overhead_press_video",
-    "resistanceIntensity": "medium",
-    "targetMuscles": ["Deltoids", "Triceps", "Upper Chest", "Core"],
-    "tips": [
-      "Don't arch your back excessively",
-      "Keep your wrists straight",
-      "Start with lighter weight",
-      "Breathe out as you press up"
-    ],
-    "variations": [
-      "Dumbbell Press",
-      "Seated Press",
-      "Arnold Press",
-      "Pike Push-Up"
-    ]
-  },
-  {
-    "id": "5",
-    "name": "Pull-Up",
-    "description": "Pull-ups are an excellent upper body exercise that targets the back muscles, particularly the lats. They also engage the biceps and core.",
-    "instructions": [
-      "Hang from a pull-up bar with overhand grip",
-      "Hands slightly wider than shoulder-width",
-      "Start from a dead hang position",
-      "Pull your chest toward the bar",
-      "Squeeze your shoulder blades together",
-      "Lower yourself back to starting position",
-      "Control the descent"
-    ],
-    "muscleGroup": "back",
-    "difficulty": "advanced",
-    "duration": 12,
-    "calories": 90,
-    "equipment": ["pullupBar"],
-    "imageName": "pull_up",
-    "videoName": "pull_up_video",
-    "resistanceIntensity": "high",
-    "targetMuscles": ["Latissimus Dorsi", "Rhomboids", "Biceps", "Rear Delts"],
-    "tips": [
-      "Avoid swinging or using momentum",
-      "Focus on pulling with your back, not arms",
-      "Use assistance bands if needed",
-      "Full range of motion is key"
-    ],
-    "variations": [
-      "Chin-Up",
-      "Wide-Grip Pull-Up",
-      "Neutral Grip Pull-Up",
-      "Assisted Pull-Up"
-    ]
-  },
-  {
-    "id": "6",
-    "name": "Plank",
-    "description": "The plank is an isometric core exercise that builds strength and endurance in the abdominals, back, and shoulders. It's excellent for developing core stability.",
-    "instructions": [
-      "Start in a push-up position",
-      "Lower onto your forearms",
-      "Keep your body in a straight line",
-      "Engage your core muscles",
-      "Hold the position",
-      "Breathe normally",
-      "Keep your hips level"
-    ],
-    "muscleGroup": "core",
-    "difficulty": "beginner",
-    "duration": 8,
-    "calories": 40,
-    "equipment": ["mat"],
-    "imageName": "plank",
-    "videoName": null,
-    "resistanceIntensity": "low",
-    "targetMuscles": ["Rectus Abdominis", "Transverse Abdominis", "Obliques", "Shoulders"],
-    "tips": [
-      "Don't let your hips sag or pike up",
-      "Keep your head in neutral position",
-      "Start with shorter holds and build up",
-      "Focus on quality over quantity"
-    ],
-    "variations": [
-      "Side Plank",
-      "Plank Up-Down",
-      "Plank with Leg Lift",
-      "Mountain Climber"
-    ]
-  },
-  {
-    "id": "7",
-    "name": "Bench Press",
-    "description": "The bench press is a classic chest exercise that builds upper body strength and muscle mass. It primarily targets the pectorals while also engaging the shoulders and triceps.",
-    "instructions": [
-      "Lie flat on a bench with feet on the floor",
-      "Grip the bar slightly wider than shoulder-width",
-      "Unrack the bar and hold it above your chest",
-      "Lower the bar slowly to your chest",
-      "Press the bar back up to starting position",
-      "Keep your core tight throughout"
-    ],
-    "muscleGroup": "chest",
-    "difficulty": "intermediate",
-    "duration": 20,
-    "calories": 150,
-    "equipment": ["barbell", "bench"],
-    "imageName": "push_up",
-    "videoName": null,
-    "resistanceIntensity": "high",
-    "targetMuscles": ["Pectorals", "Deltoids", "Triceps"],
-    "tips": [
-      "Keep your shoulder blades pulled back",
-      "Don't bounce the bar off your chest",
-      "Use a spotter for heavy weights",
-      "Maintain control throughout the movement"
-    ],
-    "variations": [
-      "Incline Bench Press",
-      "Decline Bench Press",
-      "Dumbbell Bench Press",
-      "Close-Grip Bench Press"
-    ]
-  },
-  {
-    "id": "8",
-    "name": "Bulgarian Split Squat",
-    "description": "A unilateral leg exercise that targets the quadriceps, glutes, and hamstrings while improving balance and stability.",
-    "instructions": [
-      "Stand 2-3 feet in front of a bench",
-      "Place the top of one foot on the bench behind you",
-      "Lower your body until your front thigh is parallel to the floor",
-      "Push through your front heel to return to starting position",
-      "Complete all reps on one leg before switching"
-    ],
-    "muscleGroup": "legs",
-    "difficulty": "intermediate",
-    "duration": 12,
-    "calories": 100,
-    "equipment": ["bench"],
-    "imageName": "dumbbell_squat",
-    "videoName": null,
-    "resistanceIntensity": "medium",
-    "targetMuscles": ["Quadriceps", "Glutes", "Hamstrings", "Calves"],
-    "tips": [
-      "Keep most of your weight on your front leg",
-      "Don't let your front knee cave inward",
-      "Maintain an upright torso",
-      "Control the descent"
-    ],
-    "variations": [
-      "Dumbbell Bulgarian Split Squat",
-      "Reverse Lunge",
-      "Lateral Lunge",
-      "Curtsy Lunge"
-    ]
-  },
-  {
-    "id": "9",
     "name": "Bent-Over Row",
-    "description": "A compound back exercise that targets the latissimus dorsi, rhomboids, and middle trapezius while also engaging the biceps.",
+    "description": "A compound pulling exercise that targets the muscles of the upper back, particularly the latissimus dorsi, rhomboids, and middle trapezius.",
     "instructions": [
       "Stand with feet hip-width apart, holding a barbell",
       "Hinge at the hips and lean forward 45 degrees",
@@ -292,7 +48,7 @@
     "duration": 15,
     "calories": 120,
     "equipment": ["barbell"],
-    "imageName": "deadlift",
+    "imageName": "bent_over_row",
     "videoName": null,
     "resistanceIntensity": "medium",
     "targetMuscles": ["Latissimus Dorsi", "Rhomboids", "Middle Traps", "Biceps"],
@@ -307,6 +63,318 @@
       "T-Bar Row",
       "Cable Row",
       "Single-Arm Row"
+    ]
+  },
+  {
+    "id": "3",
+    "name": "Push-Ups",
+    "description": "A classic bodyweight exercise that targets the chest, shoulders, and triceps while engaging the core.",
+    "instructions": [
+      "Start in a plank position with hands slightly wider than shoulders",
+      "Keep your body in a straight line from head to heels",
+      "Lower your chest toward the floor",
+      "Push back up to starting position",
+      "Keep your core engaged throughout"
+    ],
+    "muscleGroup": "chest",
+    "difficulty": "beginner",
+    "duration": 10,
+    "calories": 80,
+    "equipment": [],
+    "imageName": "push_ups",
+    "videoName": null,
+    "resistanceIntensity": "light",
+    "targetMuscles": ["Pectorals", "Anterior Deltoids", "Triceps"],
+    "tips": [
+      "Don't let your hips sag",
+      "Keep your head in neutral position",
+      "Breathe out as you push up"
+    ],
+    "variations": [
+      "Incline Push-Ups",
+      "Diamond Push-Ups",
+      "Wide-Grip Push-Ups"
+    ]
+  },
+  {
+    "id": "4",
+    "name": "Overhead Press",
+    "description": "A fundamental shoulder exercise that builds strength and stability in the shoulders and core.",
+    "instructions": [
+      "Stand with feet shoulder-width apart",
+      "Hold dumbbells at shoulder height",
+      "Press weights straight up overhead",
+      "Keep your core tight",
+      "Lower with control to starting position"
+    ],
+    "muscleGroup": "shoulders",
+    "difficulty": "intermediate",
+    "duration": 12,
+    "calories": 100,
+    "equipment": ["dumbbells"],
+    "imageName": "overhead_press",
+    "videoName": null,
+    "resistanceIntensity": "medium",
+    "targetMuscles": ["Anterior Deltoids", "Medial Deltoids", "Triceps"],
+    "tips": [
+      "Don't arch your back excessively",
+      "Keep your core engaged",
+      "Press straight up, not forward"
+    ],
+    "variations": [
+      "Military Press",
+      "Arnold Press",
+      "Pike Push-Ups"
+    ]
+  },
+  {
+    "id": "5",
+    "name": "Bicep Curls",
+    "description": "An isolation exercise that targets the biceps muscles of the upper arm.",
+    "instructions": [
+      "Stand with feet hip-width apart",
+      "Hold dumbbells with arms at your sides",
+      "Keep your elbows close to your body",
+      "Curl the weights up toward your shoulders",
+      "Squeeze at the top, then lower slowly"
+    ],
+    "muscleGroup": "arms",
+    "difficulty": "beginner",
+    "duration": 10,
+    "calories": 70,
+    "equipment": ["dumbbells"],
+    "imageName": "bicep_curls",
+    "videoName": null,
+    "resistanceIntensity": "light",
+    "targetMuscles": ["Biceps", "Brachialis"],
+    "tips": [
+      "Don't swing the weights",
+      "Control the lowering phase",
+      "Keep your wrists straight"
+    ],
+    "variations": [
+      "Hammer Curls",
+      "Concentration Curls",
+      "Cable Curls"
+    ]
+  },
+  {
+    "id": "6",
+    "name": "Lunges",
+    "description": "A unilateral leg exercise that improves balance while strengthening the legs and glutes.",
+    "instructions": [
+      "Stand with feet hip-width apart",
+      "Step forward with one leg",
+      "Lower your body until both knees are bent at 90 degrees",
+      "Push through your front heel to return to start",
+      "Alternate legs or complete one side first"
+    ],
+    "muscleGroup": "legs",
+    "difficulty": "beginner",
+    "duration": 12,
+    "calories": 90,
+    "equipment": [],
+    "imageName": "lunges",
+    "videoName": null,
+    "resistanceIntensity": "light",
+    "targetMuscles": ["Quadriceps", "Glutes", "Hamstrings", "Calves"],
+    "tips": [
+      "Keep your torso upright",
+      "Don't let your front knee go past your toes",
+      "Step far enough forward"
+    ],
+    "variations": [
+      "Reverse Lunges",
+      "Walking Lunges",
+      "Lateral Lunges"
+    ]
+  },
+  {
+    "id": "7",
+    "name": "Glute Bridges",
+    "description": "An excellent exercise for activating and strengthening the glute muscles.",
+    "instructions": [
+      "Lie on your back with knees bent",
+      "Feet flat on the floor, hip-width apart",
+      "Squeeze your glutes and lift your hips",
+      "Create a straight line from knees to shoulders",
+      "Hold briefly, then lower slowly"
+    ],
+    "muscleGroup": "glutes",
+    "difficulty": "beginner",
+    "duration": 8,
+    "calories": 60,
+    "equipment": [],
+    "imageName": "glute_bridges",
+    "videoName": null,
+    "resistanceIntensity": "light",
+    "targetMuscles": ["Glutes", "Hamstrings", "Core"],
+    "tips": [
+      "Squeeze your glutes at the top",
+      "Don't arch your back excessively",
+      "Keep your core engaged"
+    ],
+    "variations": [
+      "Single-Leg Glute Bridge",
+      "Hip Thrusts",
+      "Weighted Glute Bridge"
+    ]
+  },
+  {
+    "id": "8",
+    "name": "Plank",
+    "description": "A core stabilization exercise that strengthens the entire core and improves posture.",
+    "instructions": [
+      "Start in a push-up position",
+      "Lower to your forearms",
+      "Keep your body in a straight line",
+      "Hold the position",
+      "Breathe normally throughout"
+    ],
+    "muscleGroup": "core",
+    "difficulty": "beginner",
+    "duration": 5,
+    "calories": 25,
+    "equipment": [],
+    "imageName": "plank",
+    "videoName": null,
+    "resistanceIntensity": "light",
+    "targetMuscles": ["Rectus Abdominis", "Transverse Abdominis", "Obliques"],
+    "tips": [
+      "Don't let your hips sag or pike up",
+      "Keep your head in neutral position",
+      "Engage your core muscles"
+    ],
+    "variations": [
+      "Side Plank",
+      "Plank Up-Downs",
+      "Plank Jacks"
+    ]
+  },
+  {
+    "id": "9",
+    "name": "Burpees",
+    "description": "A full-body exercise that combines strength training and cardiovascular conditioning.",
+    "instructions": [
+      "Start standing upright",
+      "Drop into a squat position",
+      "Place hands on the floor and jump feet back",
+      "Perform a push-up",
+      "Jump feet back to squat position",
+      "Jump up with arms overhead"
+    ],
+    "muscleGroup": "fullBody",
+    "difficulty": "advanced",
+    "duration": 15,
+    "calories": 150,
+    "equipment": [],
+    "imageName": "burpees",
+    "videoName": null,
+    "resistanceIntensity": "high",
+    "targetMuscles": ["Full Body", "Cardiovascular System"],
+    "tips": [
+      "Maintain proper form throughout",
+      "Modify by stepping instead of jumping",
+      "Keep your core engaged"
+    ],
+    "variations": [
+      "Half Burpees",
+      "Burpee Box Jumps",
+      "Burpee Pull-Ups"
+    ]
+  },
+  {
+    "id": "10",
+    "name": "Dumbbell Chest Press",
+    "description": "A chest exercise performed with dumbbells that allows for greater range of motion than a barbell.",
+    "instructions": [
+      "Lie on a bench with dumbbells in each hand",
+      "Start with weights at chest level",
+      "Press dumbbells straight up",
+      "Bring weights together at the top",
+      "Lower with control to starting position"
+    ],
+    "muscleGroup": "chest",
+    "difficulty": "intermediate",
+    "duration": 12,
+    "calories": 110,
+    "equipment": ["dumbbells", "bench"],
+    "imageName": "dumbbell_chest_press",
+    "videoName": null,
+    "resistanceIntensity": "medium",
+    "targetMuscles": ["Pectorals", "Anterior Deltoids", "Triceps"],
+    "tips": [
+      "Keep your feet flat on the floor",
+      "Don't let the weights drift toward your head",
+      "Control the descent"
+    ],
+    "variations": [
+      "Incline Dumbbell Press",
+      "Decline Dumbbell Press",
+      "Single-Arm Dumbbell Press"
+    ]
+  },
+  {
+    "id": "11",
+    "name": "Lat Pulldowns",
+    "description": "A cable machine exercise that targets the latissimus dorsi and other back muscles.",
+    "instructions": [
+      "Sit at a lat pulldown machine",
+      "Grab the bar with a wide overhand grip",
+      "Lean back slightly",
+      "Pull the bar down to your upper chest",
+      "Squeeze your shoulder blades together",
+      "Return to starting position with control"
+    ],
+    "muscleGroup": "back",
+    "difficulty": "intermediate",
+    "duration": 15,
+    "calories": 110,
+    "equipment": ["cable_machine"],
+    "imageName": "lat_pulldowns",
+    "videoName": null,
+    "resistanceIntensity": "medium",
+    "targetMuscles": ["Latissimus Dorsi", "Rhomboids", "Middle Traps", "Biceps"],
+    "tips": [
+      "Don't lean back too far",
+      "Focus on pulling with your back",
+      "Don't use momentum"
+    ],
+    "variations": [
+      "Close-Grip Pulldowns",
+      "Reverse-Grip Pulldowns",
+      "Single-Arm Pulldowns"
+    ]
+  },
+  {
+    "id": "12",
+    "name": "Tricep Dips",
+    "description": "A bodyweight exercise that targets the triceps muscles on the back of the upper arm.",
+    "instructions": [
+      "Sit on the edge of a bench or chair",
+      "Place hands beside your hips",
+      "Slide your body off the edge",
+      "Lower your body by bending your elbows",
+      "Push back up to starting position"
+    ],
+    "muscleGroup": "arms",
+    "difficulty": "intermediate",
+    "duration": 10,
+    "calories": 80,
+    "equipment": ["bench"],
+    "imageName": "tricep_dips",
+    "videoName": null,
+    "resistanceIntensity": "medium",
+    "targetMuscles": ["Triceps", "Anterior Deltoids", "Pectorals"],
+    "tips": [
+      "Keep your body close to the bench",
+      "Don't go too low",
+      "Keep your legs straight for more difficulty"
+    ],
+    "variations": [
+      "Assisted Tricep Dips",
+      "Weighted Tricep Dips",
+      "Ring Dips"
     ]
   }
 ]

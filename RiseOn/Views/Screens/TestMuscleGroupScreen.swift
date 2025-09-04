@@ -9,49 +9,29 @@ import SwiftUI
 
 struct TestMuscleGroupScreen: View {
     @StateObject private var exerciseService = ExerciseService.shared
-    @State private var showingExerciseList: MuscleGroup?
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Navigation Bar
-            navigationBar
-            
-            // Content
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: DesignTokens.Spacing.lg) {
-                    // Header
-                    headerSection
-                    
-                    // Muscle Groups
-                    muscleGroupsSection
-                }
-                .padding(.horizontal, DesignTokens.Padding.screen)
-                .padding(.bottom, 100)
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack(spacing: DesignTokens.Spacing.lg) {
+                // Header
+                headerSection
+                
+                // Muscle Groups
+                muscleGroupsSection
             }
+            .padding(.horizontal, DesignTokens.Padding.screen)
+            .padding(.bottom, 100)
         }
         .background(Color.black.ignoresSafeArea())
-        .navigationBarHidden(true)
-        .sheet(item: $showingExerciseList) { muscleGroup in
-            ExerciseListScreen(muscleGroup: muscleGroup)
-        }
-    }
-}
-
-// MARK: - Components
-extension TestMuscleGroupScreen {
-    
-    private var navigationBar: some View {
-        ZStack {
-            // Заголовок по центру экрана
-            Text("Workouts")
-                .riseOnHeading3()
-                .foregroundColor(.typographyPrimary)
+        .navigationTitle("Workouts")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                CustomBackButton()
+            }
             
-            // Боковые кнопки
-            HStack {
-                Spacer()
-                
-                // Кнопка поиска справа
+            ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {}) {
                     Image(systemName: "magnifyingglass")
                         .font(.system(size: 20, weight: .light))
@@ -59,11 +39,11 @@ extension TestMuscleGroupScreen {
                 }
             }
         }
-        .padding(.horizontal, DesignTokens.Padding.screen)
-        .padding(.top, 8)
-        .frame(height: 52)
-        .background(Color.black.ignoresSafeArea(edges: .top))
     }
+}
+
+// MARK: - Components
+extension TestMuscleGroupScreen {
     
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
@@ -83,13 +63,16 @@ extension TestMuscleGroupScreen {
     private var muscleGroupsSection: some View {
         VStack(spacing: DesignTokens.Spacing.md) {
             ForEach(availableMuscleGroups, id: \.self) { muscleGroup in
-                MuscleGroupCard(
-                    muscleGroup: muscleGroup,
-                    exerciseCount: exerciseCountFor(muscleGroup),
-                    estimatedTime: estimatedTimeFor(muscleGroup)
-                ) {
-                    showingExerciseList = muscleGroup
+                NavigationLink(destination: ExerciseListScreen(muscleGroup: muscleGroup)) {
+                    MuscleGroupCard(
+                        muscleGroup: muscleGroup,
+                        exerciseCount: exerciseCountFor(muscleGroup),
+                        estimatedTime: estimatedTimeFor(muscleGroup)
+                    ) {
+                        // NavigationLink handles the action
+                    }
                 }
+                .buttonStyle(PlainButtonStyle())
             }
         }
     }
@@ -114,9 +97,23 @@ extension TestMuscleGroupScreen {
     }
 }
 
-// MARK: - MuscleGroup Identifiable
-extension MuscleGroup: Identifiable {
-    public var id: String { self.rawValue }
+// MARK: - Custom Back Button
+struct CustomBackButton: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        Button(action: { dismiss() }) {
+            HStack(spacing: 6) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.typographyPrimary)
+                
+                Text("Back")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundColor(.typographyPrimary)
+            }
+        }
+    }
 }
 
 #Preview {

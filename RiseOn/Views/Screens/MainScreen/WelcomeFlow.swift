@@ -46,7 +46,7 @@ struct MainTabInterface: View {
     var body: some View {
         TabView(selection: $mainTabCoordinator.selectedTab) {
             // Главная вкладка
-            NavigationStack {
+            NavigationView {
                 MainPage()
                     .applyAppStyle(title: "Main")
             }
@@ -57,7 +57,7 @@ struct MainTabInterface: View {
             .tag(0)
             
             // Тренировки
-            NavigationStack {
+            NavigationView {
                 WorkoutPage()
                     .applyAppStyle(title: "Workout")
             }
@@ -68,7 +68,7 @@ struct MainTabInterface: View {
             .tag(1)
             
             // Питание
-            NavigationStack {
+            NavigationView {
                 NutritionPage()
                     .applyAppStyle(title: "Nutrition")
             }
@@ -79,7 +79,7 @@ struct MainTabInterface: View {
             .tag(2)
             
             // Прогресс
-            NavigationStack {
+            NavigationView {
                 ProgressPage()
                     .applyAppStyle(title: "Progress")
             }

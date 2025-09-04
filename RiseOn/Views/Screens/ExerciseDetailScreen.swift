@@ -13,30 +13,24 @@ struct ExerciseDetailScreen: View {
     @State private var selectedTab: DetailTab = .instruction
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Navigation Bar
-            navigationBar
-            
-            // Content
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 0) {
-                    // Hero Image Section
-                    heroImageSection
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack(spacing: 0) {
+                // Hero Image Section
+                heroImageSection
+                
+                // Content Section
+                VStack(spacing: DesignTokens.Spacing.sectionSpacing) {
+                    // Header Info
+                    exerciseHeaderSection
                     
-                    // Content Section
-                    VStack(spacing: DesignTokens.Spacing.sectionSpacing) {
-                        // Header Info
-                        exerciseHeaderSection
-                        
-                        // Tab Selection
-                        tabSelectionSection
-                        
-                        // Tab Content
-                        tabContentSection
-                    }
-                    .padding(.horizontal, DesignTokens.Padding.screen)
-                    .padding(.bottom, 100) // Space for bottom button
+                    // Segmented Tab Selection
+                    segmentedTabSelection
+                    
+                    // Tab Content
+                    tabContentSection
                 }
+                .padding(.horizontal, DesignTokens.Padding.screen)
+                .padding(.bottom, 50) // Reduced padding since no button
             }
         }
         .background(Color.black.ignoresSafeArea())
@@ -65,9 +59,10 @@ extension ExerciseDetailScreen {
     private var navigationBar: some View {
         ZStack {
             // Заголовок по центру экрана
-            Text(selectedTab.rawValue)
+            Text(exercise.name)
                 .riseOnHeading3()
                 .foregroundColor(.typographyPrimary)
+                .lineLimit(1)
             
             // Боковые кнопки
             HStack {
@@ -95,38 +90,7 @@ extension ExerciseDetailScreen {
     }
     
     private var heroImageSection: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .bottom) {
-                // Exercise Image with fallback
-                ZStack {
-                    // Fallback background
-                    RoundedRectangle(cornerRadius: 0)
-                        .fill(Color.typographyGrey.opacity(0.2))
-                        .frame(width: geometry.size.width, height: 300)
-                    
-                    // Actual image
-                    Image(exercise.imageName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: geometry.size.width, height: 300)
-                        .clipped()
-                }
-                .overlay(
-                    // Gradient overlay
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            .clear,
-                            .clear,
-                            .black.opacity(0.3),
-                            .black.opacity(0.7)
-                        ]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-            }
-        }
-        .frame(height: 300)
+        ExerciseHeroImage(exercise: exercise)
     }
     
     private var exerciseHeaderSection: some View {
@@ -155,23 +119,84 @@ extension ExerciseDetailScreen {
                 
                 Spacer()
             }
-        }
-    }
-    
-    private var tabSelectionSection: some View {
-        HStack(spacing: DesignTokens.Spacing.md) {
-            ForEach(DetailTab.allCases, id: \.self) { tab in
-                ExerciseTabButton(
-                    tab: tab,
-                    isSelected: selectedTab == tab
-                ) {
-                    withAnimation(.easeInOut(duration: DesignTokens.Animation.fast)) {
-                        selectedTab = tab
+            
+            // Equipment Section
+            if !exercise.equipment.isEmpty {
+                VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
+                    Text("Equipment")
+                        .riseOnHeading4()
+                        .foregroundColor(.typographyPrimary)
+                    
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: DesignTokens.Spacing.sm) {
+                            ForEach(exercise.equipment, id: \.self) { equipment in
+                                EquipmentChip(equipment: equipment)
+                            }
+                        }
+                        .padding(.horizontal, 2)
                     }
                 }
             }
-            
-            Spacer()
+        }
+    }
+    
+    private var segmentedTabSelection: some View {
+        VStack(spacing: DesignTokens.Spacing.md) {
+            // Segmented Picker with gradient background
+            ZStack {
+                // Background gradient
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.primaryButton.opacity(0.1),
+                        Color.primaryButton.opacity(0.05)
+                    ]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .cornerRadius(DesignTokens.CornerRadius.button)
+                
+                HStack(spacing: 0) {
+                    ForEach(DetailTab.allCases, id: \.self) { tab in
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                selectedTab = tab
+                            }
+                        }) {
+                            VStack(spacing: 4) {
+                                Image(systemName: tab.icon)
+                                    .font(.system(size: 16, weight: .medium))
+                                
+                                Text(tab.rawValue)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                            }
+                            .foregroundColor(selectedTab == tab ? .black : .typographyGrey)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 60)
+                            .background(
+                                Group {
+                                    if selectedTab == tab {
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                Color.primaryButton,
+                                                Color.primaryButton.opacity(0.8)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                        .cornerRadius(DesignTokens.CornerRadius.button - 2)
+                                    } else {
+                                        Color.clear
+                                    }
+                                }
+                            )
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .padding(4)
+            }
+            .frame(height: 68)
         }
     }
     
@@ -188,6 +213,8 @@ extension ExerciseDetailScreen {
     }
 }
 
+// MARK: - Supporting Components
+
 // MARK: - Stat Item Component
 struct StatItem: View {
     let icon: String
@@ -199,10 +226,10 @@ struct StatItem: View {
             HStack(spacing: DesignTokens.Spacing.xs) {
                 Image(systemName: icon)
                     .font(.system(size: 14))
-                    .foregroundColor(.typographyGrey)
+                    .foregroundColor(.primaryButton)
                 
                 Text(value)
-                    .riseOnBodySmall(.medium)
+                    .riseOnHeading4()
                     .foregroundColor(.typographyPrimary)
             }
             
@@ -220,16 +247,14 @@ struct DifficultyIndicator: View {
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.xs) {
             HStack(spacing: DesignTokens.Spacing.xs) {
-                Image(systemName: "star.fill")
-                    .font(.system(size: 14))
-                    .foregroundColor(.typographyGrey)
-                
-                Text(difficulty.displayName)
-                    .riseOnBodySmall(.medium)
-                    .foregroundColor(difficultyColor)
+                ForEach(0..<3) { index in
+                    Circle()
+                        .fill(index < difficulty.difficultyLevel ? difficultyColor : Color.typographyGrey.opacity(0.3))
+                        .frame(width: 6, height: 6)
+                }
             }
             
-            Text("Difficulty")
+            Text(difficulty.displayName)
                 .riseOnCaption()
                 .foregroundColor(.typographyGrey)
         }
@@ -244,32 +269,26 @@ struct DifficultyIndicator: View {
     }
 }
 
-// MARK: - Exercise Tab Button
-struct ExerciseTabButton: View {
-    let tab: DetailTab
-    let isSelected: Bool
-    let action: () -> Void
+// MARK: - Equipment Chip
+struct EquipmentChip: View {
+    let equipment: Equipment
     
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: DesignTokens.Spacing.xs) {
-                Image(systemName: tab.icon)
-                    .font(.system(size: 14, weight: .medium))
-                
-                Text(tab.rawValue)
-                    .riseOnBodySmall(.medium)
-            }
-            .foregroundColor(isSelected ? .black : .typographyGrey)
-            .padding(.horizontal, DesignTokens.Spacing.md)
-            .padding(.vertical, DesignTokens.Spacing.sm)
-            .background(
-                isSelected ? 
-                Color.primaryButton : 
-                Color.typographyGrey.opacity(0.1)
-            )
-            .cornerRadius(DesignTokens.CornerRadius.pill)
+        HStack(spacing: DesignTokens.Spacing.sm) {
+            Image(systemName: equipment.icon)
+                .font(.system(size: 14))
+                .foregroundColor(.primaryButton)
+            
+            Text(equipment.displayName)
+                .riseOnBody()
+                .foregroundColor(.typographyPrimary)
         }
-        .buttonStyle(PlainButtonStyle())
+        .padding(.horizontal, DesignTokens.Spacing.md)
+        .padding(.vertical, DesignTokens.Spacing.sm)
+        .background(
+            RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.sm)
+                .fill(Color.primaryButton.opacity(0.1))
+        )
     }
 }
 

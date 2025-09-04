@@ -13,16 +13,16 @@ struct InstructionTabContent: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.sectionSpacing) {
-            // Description
+            // Exercise Description
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
-                Text("Description")
+                Text("About this exercise")
                     .riseOnHeading3()
                     .foregroundColor(.typographyPrimary)
                 
                 Text(exercise.description)
                     .riseOnBody()
                     .foregroundColor(.typographyGrey)
-                    .lineSpacing(4)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             
             // Instructions
@@ -33,28 +33,7 @@ struct InstructionTabContent: View {
                 
                 VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
                     ForEach(Array(exercise.instructions.enumerated()), id: \.offset) { index, instruction in
-                        InstructionStep(
-                            number: index + 1,
-                            text: instruction
-                        )
-                    }
-                }
-            }
-            
-            // Equipment
-            if !exercise.equipment.isEmpty {
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
-                    Text("Equipment needed")
-                        .riseOnHeading3()
-                        .foregroundColor(.typographyPrimary)
-                    
-                    LazyVGrid(
-                        columns: Array(repeating: GridItem(.flexible(), spacing: DesignTokens.Spacing.sm), count: 2),
-                        spacing: DesignTokens.Spacing.sm
-                    ) {
-                        ForEach(exercise.equipment, id: \.self) { equipment in
-                            EquipmentCard(equipment: equipment)
-                        }
+                        InstructionStep(number: index + 1, text: instruction)
                     }
                 }
             }
@@ -68,19 +47,14 @@ struct MuscleTabContent: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.sectionSpacing) {
-            // Muscle Focus
-            Text("Muscle Focus")
-                .riseOnHeading3()
-                .foregroundColor(.typographyPrimary)
-            
-            // Body diagram with front and back views
-            HStack(spacing: DesignTokens.Spacing.md) {
-                // Front view
-                VStack(spacing: DesignTokens.Spacing.sm) {
-                    Text("Front")
-                        .riseOnCaption(.medium)
-                        .foregroundColor(.typographyGrey)
-                    
+            // Muscle Diagram
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
+                Text("Muscle Groups")
+                    .riseOnHeading3()
+                    .foregroundColor(.typographyPrimary)
+                
+                HStack(spacing: DesignTokens.Spacing.md) {
+                    // Front view
                     ZStack {
                         RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md)
                             .fill(Color.typographyGrey.opacity(0.1))
@@ -95,7 +69,7 @@ struct MuscleTabContent: View {
                                     .clipped()
                             } else {
                                 VStack(spacing: 8) {
-                                    Image(systemName: "figure.strengthtraining.traditional")
+                                    Image(systemName: "figure.walk")
                                         .font(.system(size: 40))
                                         .foregroundColor(.typographyGrey)
                                     Text("Front View")
@@ -106,14 +80,8 @@ struct MuscleTabContent: View {
                         }
                     }
                     .cornerRadius(DesignTokens.CornerRadius.md)
-                }
-                
-                // Back view
-                VStack(spacing: DesignTokens.Spacing.sm) {
-                    Text("Back")
-                        .riseOnCaption(.medium)
-                        .foregroundColor(.typographyGrey)
                     
+                    // Back view
                     ZStack {
                         RoundedRectangle(cornerRadius: DesignTokens.CornerRadius.md)
                             .fill(Color.typographyGrey.opacity(0.1))
@@ -145,7 +113,7 @@ struct MuscleTabContent: View {
             // Target Muscles
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
                 Text("Target Muscles")
-                    .riseOnHeading4()
+                    .riseOnHeading3()
                     .foregroundColor(.typographyPrimary)
                 
                 LazyVGrid(
@@ -161,7 +129,7 @@ struct MuscleTabContent: View {
             // Resistance Intensity
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
                 Text("Resistance Intensity")
-                    .riseOnHeading4()
+                    .riseOnHeading3()
                     .foregroundColor(.typographyPrimary)
                 
                 ResistanceIntensityIndicator(intensity: exercise.resistanceIntensity)
@@ -231,7 +199,7 @@ struct InstructionStep: View {
             // Step text
             Text(text)
                 .riseOnBody()
-                .foregroundColor(.typographyGrey)
+                .foregroundColor(.typographyPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
@@ -248,7 +216,7 @@ struct EquipmentCard: View {
                     .foregroundColor(.primaryButton)
                 
                 Text(equipment.displayName)
-                    .riseOnBodySmall(.medium)
+                    .riseOnBody(.medium)
                     .foregroundColor(.typographyPrimary)
                     .lineLimit(1)
                 
@@ -265,7 +233,7 @@ struct TargetMuscleCard: View {
         RiseOnCard(style: .basic, size: .compact) {
             HStack {
                 Text(muscleName)
-                    .riseOnBodySmall(.medium)
+                    .riseOnBody(.medium)
                     .foregroundColor(.typographyPrimary)
                     .lineLimit(1)
                 
@@ -292,7 +260,7 @@ struct ResistanceIntensityIndicator: View {
                     
                     Spacer()
                     
-                    Text("Resistance intensity")
+                    Text("Resistance Level")
                         .riseOnCaption()
                         .foregroundColor(.typographyGrey)
                 }
@@ -301,20 +269,11 @@ struct ResistanceIntensityIndicator: View {
                 HStack(spacing: DesignTokens.Spacing.xs) {
                     ForEach(1...3, id: \.self) { index in
                         RoundedRectangle(cornerRadius: 2)
-                            .fill(index <= intensity.intensityLevel ? intensityColor : Color.typographyGrey.opacity(0.3))
+                            .fill(index <= intensity.intensityLevel ? intensity.color : Color.typographyGrey.opacity(0.3))
                             .frame(height: 6)
-                            .frame(maxWidth: .infinity)
                     }
                 }
             }
-        }
-    }
-    
-    private var intensityColor: Color {
-        switch intensity {
-        case .low: return .green
-        case .medium: return .orange
-        case .high: return .red
         }
     }
 }
@@ -325,13 +284,13 @@ struct TipCard: View {
     var body: some View {
         RiseOnCard(style: .basic, size: .medium) {
             HStack(alignment: .top, spacing: DesignTokens.Spacing.md) {
-                Image(systemName: "lightbulb.fill")
+                Image(systemName: "lightbulb")
                     .font(.system(size: 16))
                     .foregroundColor(.primaryButton)
                 
                 Text(tip)
                     .riseOnBody()
-                    .foregroundColor(.typographyGrey)
+                    .foregroundColor(.typographyPrimary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
@@ -345,15 +304,50 @@ struct VariationCard: View {
         RiseOnCard(style: .basic, size: .medium) {
             HStack {
                 Text(variation)
-                    .riseOnBodySmall(.medium)
+                    .riseOnBody(.medium)
                     .foregroundColor(.typographyPrimary)
+                    .lineLimit(1)
                 
                 Spacer()
                 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12))
-                    .foregroundColor(.typographyGrey)
+                Image(systemName: "arrow.right.circle")
+                    .font(.system(size: 16))
+                    .foregroundColor(.primaryButton)
             }
         }
     }
+}
+
+#Preview {
+    let mockExercise = Exercise(
+        id: "1",
+        name: "Dumbbell Squat",
+        description: "The dumbbell squat is a strength exercise that primarily targets the muscles of the lower body.",
+        instructions: [
+            "Stand with feet shoulder-width apart",
+            "Hold dumbbells at your sides",
+            "Lower your body by bending your knees",
+            "Push through your heels to return"
+        ],
+        muscleGroup: .legs,
+        difficulty: .intermediate,
+        duration: 15,
+        calories: 120,
+        equipment: [.dumbbells],
+        imageName: "dumbbell_squat",
+        videoName: nil,
+        resistanceIntensity: .medium,
+        targetMuscles: ["Quadriceps", "Glutes", "Hamstrings"],
+        tips: ["Keep your knees in line with your toes"],
+        variations: ["Goblet Squat", "Sumo Squat"]
+    )
+    
+    VStack(spacing: 20) {
+        InstructionTabContent(exercise: mockExercise)
+        MuscleTabContent(exercise: mockExercise)
+        TipsTabContent(exercise: mockExercise)
+    }
+    .padding()
+    .background(Color.black)
+    .preferredColorScheme(.dark)
 }

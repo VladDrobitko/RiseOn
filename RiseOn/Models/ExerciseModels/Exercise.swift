@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 // MARK: - Exercise Model
 struct Exercise: Identifiable, Codable {
@@ -63,17 +64,33 @@ enum MuscleGroup: String, CaseIterable, Codable {
         }
     }
     
-    var color: String {
+    var gradientColors: LinearGradient {
+        let colors: [Color]
+        
         switch self {
-        case .chest: return "blue"
-        case .back: return "green"
-        case .shoulders: return "orange"
-        case .arms: return "red"
-        case .legs: return "purple"
-        case .glutes: return "pink"
-        case .core: return "yellow"
-        case .fullBody: return "cyan"
+        case .chest:
+            colors = [Color.red.opacity(0.4), Color.pink.opacity(0.2)]
+        case .back:
+            colors = [Color.blue.opacity(0.4), Color.cyan.opacity(0.2)]
+        case .shoulders:
+            colors = [Color.orange.opacity(0.4), Color.yellow.opacity(0.2)]
+        case .arms:
+            colors = [Color.purple.opacity(0.4), Color.indigo.opacity(0.2)]
+        case .legs:
+            colors = [Color.green.opacity(0.4), Color.mint.opacity(0.2)]
+        case .glutes:
+            colors = [Color.pink.opacity(0.4), Color.red.opacity(0.2)]
+        case .core:
+            colors = [Color.yellow.opacity(0.4), Color.orange.opacity(0.2)]
+        case .fullBody:
+            colors = [Color.primaryButton.opacity(0.4), Color.primaryButton.opacity(0.2)]
         }
+        
+        return LinearGradient(
+            gradient: Gradient(colors: colors),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
 }
 
@@ -91,81 +108,93 @@ enum ExerciseDifficulty: String, CaseIterable, Codable {
         }
     }
     
-    var color: String {
+    var difficultyLevel: Int {
         switch self {
-        case .beginner: return "green"
-        case .intermediate: return "orange"
-        case .advanced: return "red"
+        case .beginner: return 1
+        case .intermediate: return 2
+        case .advanced: return 3
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .beginner: return .green
+        case .intermediate: return .orange
+        case .advanced: return .red
         }
     }
 }
 
 // MARK: - Equipment
 enum Equipment: String, CaseIterable, Codable {
-    case none = "none"
     case dumbbells = "dumbbells"
     case barbell = "barbell"
-    case kettlebell = "kettlebell"
-    case resistanceBand = "resistanceBand"
-    case pullupBar = "pullupBar"
     case bench = "bench"
-    case mat = "mat"
+    case cable_machine = "cable_machine"
+    case resistance_bands = "resistance_bands"
+    case kettlebell = "kettlebell"
+    case pull_up_bar = "pull_up_bar"
+    case exercise_ball = "exercise_ball"
+    case yoga_mat = "yoga_mat"
     
     var displayName: String {
         switch self {
-        case .none: return "No Equipment"
         case .dumbbells: return "Dumbbells"
         case .barbell: return "Barbell"
-        case .kettlebell: return "Kettlebell"
-        case .resistanceBand: return "Resistance Band"
-        case .pullupBar: return "Pull-up Bar"
         case .bench: return "Bench"
-        case .mat: return "Exercise Mat"
+        case .cable_machine: return "Cable Machine"
+        case .resistance_bands: return "Resistance Bands"
+        case .kettlebell: return "Kettlebell"
+        case .pull_up_bar: return "Pull-up Bar"
+        case .exercise_ball: return "Exercise Ball"
+        case .yoga_mat: return "Yoga Mat"
         }
     }
     
     var icon: String {
         switch self {
-        case .none: return "checkmark.circle"
         case .dumbbells: return "dumbbell"
         case .barbell: return "figure.strengthtraining.traditional"
-        case .kettlebell: return "figure.strengthtraining.functional"
-        case .resistanceBand: return "oval.portrait"
-        case .pullupBar: return "figure.pull.ups"
         case .bench: return "rectangle"
-        case .mat: return "square"
+        case .cable_machine: return "cable.connector"
+        case .resistance_bands: return "oval"
+        case .kettlebell: return "figure.strengthtraining.functional"
+        case .pull_up_bar: return "rectangle.and.hand.point.up.left"
+        case .exercise_ball: return "circle"
+        case .yoga_mat: return "rectangle.portrait"
         }
     }
 }
 
 // MARK: - Resistance Intensity
 enum ResistanceIntensity: String, CaseIterable, Codable {
-    case low = "low"
+    case light = "light"
     case medium = "medium"
     case high = "high"
     
     var displayName: String {
         switch self {
-        case .low: return "Low"
+        case .light: return "Light"
         case .medium: return "Medium"
         case .high: return "High"
         }
     }
     
-    var color: String {
+    var color: Color {
         switch self {
-        case .low: return "green"
-        case .medium: return "orange"
-        case .high: return "red"
+        case .light: return .green
+        case .medium: return .orange
+        case .high: return .red
         }
     }
     
-    // Возвращает количество заполненных индикаторов (из 3)
     var intensityLevel: Int {
         switch self {
-        case .low: return 1
+        case .light: return 1
         case .medium: return 2
         case .high: return 3
         }
     }
 }
+
+// Убираем отдельное расширение - Identifiable теперь встроен в enum

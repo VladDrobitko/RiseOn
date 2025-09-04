@@ -10,61 +10,33 @@ import SwiftUI
 struct ExerciseListScreen: View {
     let muscleGroup: MuscleGroup
     @StateObject private var exerciseService = ExerciseService.shared
-    @Environment(\.dismiss) private var dismiss
-    @State private var showingExerciseDetail: Exercise?
     
     private var filteredExercises: [Exercise] {
         exerciseService.getExercises(for: muscleGroup)
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Navigation Bar
-            navigationBar
-            
-            // Content
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack(spacing: DesignTokens.Spacing.md) {
-                    // Header section
-                    headerSection
-                    
-                    // Exercise list
-                    exerciseList
-                }
-                .padding(.horizontal, DesignTokens.Padding.screen)
-                .padding(.bottom, 100)
+        ScrollView(.vertical, showsIndicators: false) {
+            LazyVStack(spacing: DesignTokens.Spacing.md) {
+                // Header section
+                headerSection
+                
+                // Exercise list
+                exerciseList
             }
+            .padding(.horizontal, DesignTokens.Padding.screen)
+            .padding(.bottom, 100)
         }
         .background(Color.black.ignoresSafeArea())
-        .navigationBarHidden(true)
-        .sheet(item: $showingExerciseDetail) { exercise in
-            ExerciseDetailScreen(exercise: exercise)
-        }
-    }
-}
-
-// MARK: - Components
-extension ExerciseListScreen {
-    
-    private var navigationBar: some View {
-        ZStack {
-            // Заголовок по центру экрана
-            Text("\(muscleGroup.displayName) Exercises")
-                .riseOnHeading3()
-                .foregroundColor(.typographyPrimary)
+        .navigationTitle("\(muscleGroup.displayName) Exercises")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                CustomBackButton()
+            }
             
-            // Боковые кнопки
-            HStack {
-                // Кнопка назад слева
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundColor(.typographyPrimary)
-                }
-                
-                Spacer()
-                
-                // Кнопка фильтров справа
+            ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {}) {
                     Image(systemName: "slider.horizontal.3")
                         .font(.system(size: 20, weight: .light))
@@ -72,11 +44,11 @@ extension ExerciseListScreen {
                 }
             }
         }
-        .padding(.horizontal, DesignTokens.Padding.screen)
-        .padding(.top, 8)
-        .frame(height: 52)
-        .background(Color.black.ignoresSafeArea(edges: .top))
     }
+}
+
+// MARK: - Components
+extension ExerciseListScreen {
     
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
@@ -144,9 +116,12 @@ extension ExerciseListScreen {
             
             // Exercise cards
             ForEach(filteredExercises) { exercise in
-                ExerciseListCard(exercise: exercise) {
-                    showingExerciseDetail = exercise
+                NavigationLink(destination: ExerciseDetailScreen(exercise: exercise)) {
+                    ExerciseListCard(exercise: exercise) {
+                        // NavigationLink handles the action
+                    }
                 }
+                .buttonStyle(PlainButtonStyle())
             }
         }
     }

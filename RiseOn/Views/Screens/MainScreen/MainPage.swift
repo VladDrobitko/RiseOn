@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainPage: View {
     @EnvironmentObject var appState: AppState
+    @StateObject private var exerciseService = ExerciseService.shared
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -16,7 +17,7 @@ struct MainPage: View {
                 // Верхняя большая карточка (Marathon Start)
                 topEventCard
                 
-                // Секция "The Best For You" с горизонтальным скроллом
+                // Секция "The Best For You" с группами мышц
                 bestForYouSection
                 
                 // Секция "Warm Ups" с двумя карточками в ряд
@@ -27,6 +28,8 @@ struct MainPage: View {
             .padding(.bottom, 100) // Отступ для tab bar
         }
         .background(Color.black.ignoresSafeArea(.all))
+        .navigationTitle("Home")
+        .navigationBarTitleDisplayMode(.large)
     }
 }
 
@@ -85,7 +88,7 @@ extension MainPage {
     }
 }
 
-// MARK: - The Best For You Section (Horizontal Scroll)
+// MARK: - The Best For You Section (Muscle Groups)
 extension MainPage {
     private var bestForYouSection: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -98,7 +101,7 @@ extension MainPage {
                 
                 Spacer()
                 
-                Button(action: {}) {
+                NavigationLink(destination: TestMuscleGroupScreen()) {
                     HStack(spacing: 4) {
                         Text("All")
                             .font(.subheadline)
@@ -112,39 +115,42 @@ extension MainPage {
                 .buttonStyle(PlainButtonStyle())
             }
             
-            // Горизонтальный скролл карточек
+            // Горизонтальный скролл карточек групп мышц
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    // Первая карточка - Tightened Legs and Glutes
-                    BestForYouCard(
-                        title: "Tightened Legs and Glutes",
-                        difficulty: "Medium",
-                        duration: "40 min",
-                        calories: "350 kCal",
-                        imageName: "legs_workout" // Пустая пока
-                    )
-                    
-                    // Вторая карточка - частично видимая
-                    BestForYouCard(
-                        title: "Explosive Tone Up",
-                        difficulty: "Hard",
-                        duration: "50 min",
-                        calories: "470 kCal",
-                        imageName: "explosive_workout"
-                    )
-                    
-                    // Третья карточка для демонстрации скролла
-                    BestForYouCard(
-                        title: "Core Strength",
-                        difficulty: "Medium",
-                        duration: "30 min",
-                        calories: "280 kCal",
-                        imageName: "core_workout"
-                    )
+                    ForEach(availableMuscleGroups, id: \.self) { muscleGroup in
+                        NavigationLink(destination: ExerciseListScreen(muscleGroup: muscleGroup)) {
+                            MuscleGroupWorkoutCard(
+                                muscleGroup: muscleGroup,
+                                exerciseCount: exerciseCountFor(muscleGroup),
+                                estimatedTime: estimatedTimeFor(muscleGroup)
+                            ) {
+                                // NavigationLink handles the action
+                            }
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
                 }
                 .padding(.horizontal, 2)
             }
         }
+    }
+    
+    // Helper methods
+    private var availableMuscleGroups: [MuscleGroup] {
+        let allGroups = MuscleGroup.allCases
+        return allGroups.filter { muscleGroup in
+            !exerciseService.getExercises(for: muscleGroup).isEmpty
+        }
+    }
+    
+    private func exerciseCountFor(_ muscleGroup: MuscleGroup) -> Int {
+        exerciseService.getExercises(for: muscleGroup).count
+    }
+    
+    private func estimatedTimeFor(_ muscleGroup: MuscleGroup) -> Int {
+        let exercises = exerciseService.getExercises(for: muscleGroup)
+        return exercises.reduce(0) { $0 + $1.duration }
     }
 }
 
@@ -199,202 +205,94 @@ extension MainPage {
     }
 }
 
-// MARK: - Best For You Card Component
-struct BestForYouCard: View {
-    let title: String
-    let difficulty: String
-    let duration: String
-    let calories: String
-    let imageName: String
+// MARK: - Muscle Group Workout Card Component
+struct MuscleGroupWorkoutCard: View {
+    let muscleGroup: MuscleGroup
+    let exerciseCount: Int
+    let estimatedTime: Int
+    let onTap: () -> Void
     
     var body: some View {
-        ZStack {
-            // Фоновая карточка
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(red: 0.2, green: 0.2, blue: 0.21))
-            
-            VStack {
-                Spacer()
+        ZStack(alignment: .bottomLeading) {
+            // Background with gradient based on muscle group
+            ZStack {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(muscleGroup.gradientColors)
+                    .frame(width: 200, height: 180)
                 
-                // Контент внизу карточки
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        // Индикатор сложности
-                        HStack(spacing: 4) {
-                            Circle()
-                                .fill(difficultyColor)
-                                .frame(width: 8, height: 8)
-                            
-                            Text(difficulty)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundColor(.white)
-                        }
-                        
-                        Spacer()
-                        
-                        // Иконка сердца
-                        Button(action: {}) {
-                            Image(systemName: "heart")
-                                .font(.system(size: 16))
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
+                // Placeholder icon
+                VStack(spacing: 8) {
+                    Image(systemName: muscleGroup.icon)
+                        .font(.system(size: 32, weight: .light))
+                        .foregroundColor(.white.opacity(0.8))
                     
-                    Text(title)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(.white)
-                        .lineLimit(2)
-                    
-                    HStack(spacing: 12) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "clock")
-                                .font(.system(size: 12))
-                                .foregroundColor(.white.opacity(0.7))
-                            
-                            Text(duration)
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        
-                        HStack(spacing: 4) {
-                            Image(systemName: "flame")
-                                .font(.system(size: 12))
-                                .foregroundColor(.white.opacity(0.7))
-                            
-                            Text(calories)
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        
-                        Spacer()
-                    }
+                    Text(muscleGroup.displayName)
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.6))
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
             }
+            .overlay(
+                // Gradient overlay for text readability
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        .clear,
+                        .clear,
+                        .black.opacity(0.3),
+                        .black.opacity(0.8)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+            .cornerRadius(16)
+            
+            // Content overlay
+            VStack(alignment: .leading, spacing: 8) {
+                // Title
+                Text(muscleGroup.displayName)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                
+                // Stats
+                HStack(spacing: 12) {
+                    // Exercise count
+                    Text("\(exerciseCount) exercises")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.8))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.white.opacity(0.2))
+                        )
+                    
+                    // Duration and target
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("\(estimatedTime) min total")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.9))
+                        
+                        Text("Build strength")
+                            .font(.caption2)
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                    
+                    Spacer()
+                }
+            }
+            .padding(16)
         }
-        .frame(width: 280, height: 160)
-    }
-    
-    private var difficultyColor: Color {
-        switch difficulty.lowercased() {
-        case "light":
-            return .green
-        case "medium":
-            return .yellow
-        case "hard":
-            return .orange
-        default:
-            return .gray
-        }
+        .frame(width: 200, height: 180)
     }
 }
 
-// MARK: - Warm Up Card Component
-struct WarmUpCard: View {
-    let title: String
-    let difficulty: String
-    let duration: String
-    let calories: String
-    let imageName: String
-    
-    var body: some View {
-        ZStack {
-            // Фоновая карточка
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(red: 0.2, green: 0.2, blue: 0.21))
-            
-            VStack {
-                Spacer()
-                
-                // Контент внизу карточки
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        // Индикатор сложности
-                        HStack(spacing: 4) {
-                            Circle()
-                                .fill(difficultyColor)
-                                .frame(width: 8, height: 8)
-                            
-                            Text(difficulty)
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundColor(.white)
-                        }
-                        
-                        Spacer()
-                        
-                        // Иконка сердца
-                        Button(action: {}) {
-                            Image(systemName: "heart")
-                                .font(.system(size: 16))
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                    
-                    Text(title)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(.white)
-                        .lineLimit(2)
-                    
-                    HStack(spacing: 12) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "clock")
-                                .font(.system(size: 12))
-                                .foregroundColor(.white.opacity(0.7))
-                            
-                            Text(duration)
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        
-                        HStack(spacing: 4) {
-                            Image(systemName: "flame")
-                                .font(.system(size: 12))
-                                .foregroundColor(.white.opacity(0.7))
-                            
-                            Text(calories)
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.7))
-                        }
-                        
-                        Spacer()
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: 160)
-    }
-    
-    private var difficultyColor: Color {
-        switch difficulty.lowercased() {
-        case "light":
-            return .green
-        case "medium":
-            return .yellow
-        case "hard":
-            return .orange
-        default:
-            return .gray
-        }
-    }
-}
-
-// MARK: - Preview
 #Preview {
-    let appState = AppState()
-    
     NavigationView {
         MainPage()
-            .environmentObject(appState)
+            .environmentObject(AppState())
     }
     .preferredColorScheme(.dark)
 }
